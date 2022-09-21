@@ -1,5 +1,7 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+
+lazy val ItTest = config("it") extend Test
 
 lazy val microservice = Project("emcs-tfe-reference-data", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -12,7 +14,17 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
   )
   .settings(publishingSettings: _*)
-  .configs(IntegrationTest)
+  .configs(ItTest)
+  .settings(inConfig(ItTest)(Defaults.itSettings): _*)
+  .settings(
+    ItTest / fork := true,
+    ItTest / unmanagedSourceDirectories := Seq((ItTest / baseDirectory).value / "it"),
+    ItTest / unmanagedClasspath += baseDirectory.value / "resources",
+    Runtime / unmanagedClasspath += baseDirectory.value / "resources",
+    ItTest / javaOptions += "-Dlogger.resource=logback-test.xml",
+    ItTest / parallelExecution := false,
+    addTestReportOption(ItTest, "int-test-reports")
+  )
   .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
