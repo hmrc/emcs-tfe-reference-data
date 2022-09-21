@@ -7,9 +7,11 @@ package uk.gov.hmrc.emcstfereferencedata.config
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject()(config: Configuration) {
+class AppConfig @Inject()(servicesConfig :ServicesConfig, config: Configuration) {
 
-  val appName: String = config.get[String]("appName")
+  def appName: String = config.get[String]("appName")
+  def stubUrl(): String = s"${servicesConfig.baseUrl("emcs-tfe-reference-data-stub")}/emcs-tfe-reference-data-stub"
 }
