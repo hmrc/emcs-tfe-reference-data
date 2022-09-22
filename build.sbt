@@ -5,6 +5,7 @@ lazy val ItTest = config("it") extend Test
 
 lazy val microservice = Project("emcs-tfe-reference-data", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
+  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     majorVersion        := 0,
     scalaVersion        := "2.13.8",
