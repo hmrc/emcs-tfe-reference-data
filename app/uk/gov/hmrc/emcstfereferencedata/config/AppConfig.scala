@@ -12,5 +12,5 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class AppConfig @Inject()(servicesConfig :ServicesConfig, config: Configuration) {
 
-  def stubUrl(): String = s"${servicesConfig.baseUrl("emcs-tfe-reference-data-stub")}/emcs-tfe-reference-data-stub"
+  def stubUrl(): String = servicesConfig.baseUrl("emcs-tfe-reference-data-stub")
 }

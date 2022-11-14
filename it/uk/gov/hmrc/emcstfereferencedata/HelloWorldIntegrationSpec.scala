@@ -20,7 +20,7 @@ class HelloWorldIntegrationSpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def uri: String = "/hello-world"
-    def referenceDataStubUri: String = s"/emcs-tfe-reference-data-stub/hello-world"
+    def referenceDataStubUri: String = s"/hello-world"
 
     def request(): WSRequest = {
       setupStubs()
