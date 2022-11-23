@@ -8,7 +8,7 @@ package uk.gov.hmrc.emcstfereferencedata.connector
 import play.api.Logger
 import play.api.http.Status._
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
-import uk.gov.hmrc.emcstfereferencedata.models.response.HelloWorldResponse
+import uk.gov.hmrc.emcstfereferencedata.models.response.{HelloWorldResponse, OtherDataReferenceList, OtherDataReferenceListResponseModel}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
@@ -21,6 +21,9 @@ class EMCSStubConnector @Inject()(val http: HttpClient,
 
   override lazy val logger: Logger = Logger(this.getClass)
   lazy val url: String = s"${config.stubUrl}/hello-world"
+
+  lazy val getOtherDataReferenceListUrl: String = s"${config.stubUrl()}/otherReferenceDataTransportMode"
+
 
   def getMessage()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, HelloWorldResponse]] = {
     http.GET[HttpResponse](url).map {
@@ -39,4 +42,20 @@ class EMCSStubConnector @Inject()(val http: HttpClient,
     }
   }
 
+  def getOtherDataReferenceList()(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Either[String, OtherDataReferenceListResponseModel]] = {
+    http.GET[HttpResponse](getOtherDataReferenceListUrl).map {
+      response =>
+        response.status match {
+          case OK => response.validateJson[OtherDataReferenceList] match {
+            case Some(valid) => Right(valid)
+            case None =>
+              logger.warn(s"Bad JSON response from reference-data-stub")
+              Left("JSON validation error")
+          }
+          case status =>
+            logger.warn(s"Unexpected status from reference-data-stub: $status")
+            Left("Unexpected downstream response status")
+        }
+    }
+  }
 }
