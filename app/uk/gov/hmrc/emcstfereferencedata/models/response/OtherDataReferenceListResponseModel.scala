@@ -10,7 +10,7 @@ import play.api.libs.json.{Json, OFormat}
 sealed trait OtherDataReferenceListResponseModel
 
 
-case class OtherDataReferenceListModelErrorModel(status: Int, reason: String) extends OtherDataReferenceListResponseModel
+case class OtherDataReferenceListErrorModel(status: Int, reason: String) extends OtherDataReferenceListResponseModel
 
 
 case class OtherDataReferenceList(otherRefdata: List[OtherDataReference]) extends OtherDataReferenceListResponseModel
@@ -19,6 +19,6 @@ object OtherDataReferenceList {
   implicit val format: OFormat[OtherDataReferenceList] = Json.format
 }
 
-object OtherDataReferenceListModelErrorModel {
-  implicit val format: OFormat[OtherDataReferenceListModelErrorModel] = Json.format
+object OtherDataReferenceListErrorModel {
+  implicit val format: OFormat[OtherDataReferenceListErrorModel] = Json.format
 }

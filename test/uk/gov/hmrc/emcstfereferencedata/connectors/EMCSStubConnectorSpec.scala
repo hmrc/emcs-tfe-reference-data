@@ -11,7 +11,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.emcstfereferencedata.connector.EMCSStubConnector
 import uk.gov.hmrc.emcstfereferencedata.mocks.config.MockAppConfig
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockHttpClient
-import uk.gov.hmrc.emcstfereferencedata.models.response.{HelloWorldResponse, OtherDataReference, OtherDataReferenceList}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{HelloWorldResponse, OtherDataReference, OtherDataReferenceList, OtherDataReferenceListErrorModel}
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
@@ -65,7 +65,7 @@ class EMCSStubConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
   }
 
   "getOtherDataReferenceList" should {
-    "return a Right" when {
+    "return a success model" when {
       "downstream call is successful" in new Test {
         val response: HttpResponse = HttpResponse(
           status = Status.OK,
@@ -79,12 +79,12 @@ class EMCSStubConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
 
         MockHttpClient.get(s"$baseUrl/otherReferenceDataTransportMode").returns(Future.successful(response))
 
-        await(connector.getOtherDataReferenceList()) shouldBe Right(OtherDataReferenceList(
-          List(OtherDataReference("test", "test", "test")))
+        await(connector.getOtherDataReferenceList()) shouldBe OtherDataReferenceList(
+          List(OtherDataReference("test", "test", "test"))
         )
       }
     }
-    "return a Left" when {
+    "return an error model" when {
       "downstream call is successful but doesn't match expected JSON" in new Test {
 
         case class TestModel(field: String)
@@ -97,14 +97,13 @@ class EMCSStubConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
 
         MockHttpClient.get(s"$baseUrl/otherReferenceDataTransportMode").returns(Future.successful(response))
 
-        await(connector.getOtherDataReferenceList()) shouldBe Left("JSON validation error")
+        await(connector.getOtherDataReferenceList()) shouldBe OtherDataReferenceListErrorModel(500, "JSON validation error")
       }
       "downstream call is unsuccessful" in new Test {
-        val response = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, json = Json.toJson(HelloWorldResponse("test message")), headers = Map.empty)
 
-        MockHttpClient.get(s"$baseUrl/otherReferenceDataTransportMode").returns(Future.successful(response))
+        MockHttpClient.get(s"$baseUrl/otherReferenceDataTransportMode").returns(Future.successful(HttpResponse(Status.INTERNAL_SERVER_ERROR, responseString = Some("test message"))))
 
-        await(connector.getOtherDataReferenceList()) shouldBe Left("Unexpected downstream response status")
+        await(connector.getOtherDataReferenceList()) shouldBe OtherDataReferenceListErrorModel(500, "test message")
       }
     }
   }
