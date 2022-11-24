@@ -6,15 +6,14 @@
 package uk.gov.hmrc.emcstfereferencedata
 
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
-import services.EMCSStubService
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockEMCSStubConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReferenceListErrorModel, OtherDataReferenceListResponseModel}
+import uk.gov.hmrc.emcstfereferencedata.services.EMCSStubService
 import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.validOtherDataReferenceListModel
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class EMCSStubServiceSpec extends UnitSpec with MockEMCSStubConnector {
 

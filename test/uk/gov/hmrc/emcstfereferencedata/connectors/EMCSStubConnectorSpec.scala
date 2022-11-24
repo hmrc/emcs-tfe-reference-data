@@ -55,7 +55,7 @@ class EMCSStubConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
         await(connector.getMessage()) shouldBe Left("JSON validation error")
       }
       "downstream call is unsuccessful" in new Test {
-        val response = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, json = Json.toJson(HelloWorldResponse("test message")), headers = Map.empty)
+        val response: HttpResponse = HttpResponse(status = Status.INTERNAL_SERVER_ERROR, json = Json.toJson(HelloWorldResponse("test message")), headers = Map.empty)
 
         MockHttpClient.get(s"$baseUrl/hello-world").returns(Future.successful(response))
 

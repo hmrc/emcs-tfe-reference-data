@@ -5,12 +5,12 @@
 
 package uk.gov.hmrc.emcstfereferencedata.models
 
-import org.scalatest.{Matchers, WordSpec}
 import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, OtherDataReferenceList}
-import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.{validOtherDataReferenceJson, validOtherDataReferenceListJson, validOtherDataReferenceListModel, validOtherDataReferenceModel1}
+import uk.gov.hmrc.emcstfereferencedata.models.response.OtherDataReference
+import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.{validOtherDataReferenceJson, validOtherDataReferenceModel1}
+import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
-class OtherDataReferenceSpec extends WordSpec with Matchers {
+class OtherDataReferenceSpec extends UnitSpec {
 
   "OtherDataReference" should {
     "read from json" when {

@@ -5,13 +5,13 @@
 
 package uk.gov.hmrc.emcstfereferencedata.services
 
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.emcstfereferencedata.connector.EMCSStubConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReferenceList, OtherDataReferenceListErrorModel, OtherDataReferenceListResponseModel}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EMCSStubService @Inject()(connector: EMCSStubConnector)(implicit ec: ExecutionContext) {
   lazy val logger: Logger = Logger(this.getClass)
