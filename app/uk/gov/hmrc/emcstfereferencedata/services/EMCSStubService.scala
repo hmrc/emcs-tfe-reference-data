@@ -17,7 +17,6 @@ class EMCSStubService @Inject()(connector: EMCSStubConnector)(implicit ec: Execu
   lazy val logger: Logger = Logger(this.getClass)
 
   def getOtherDataReferenceList(implicit headerCarrier: HeaderCarrier): Future[OtherDataReferenceListResponseModel] = {
-    logger.debug("[getBusinessDetailsService][getBusinessDetails] - Requesting Income Source Details from Connector")
     connector.getOtherDataReferenceList().map {
       case success: OtherDataReferenceList =>
         logger.debug(s"[getOtherDataReferenceList][getOtherDataReferenceList] - Retrieved Other Data Reference List:\n\n$success")
