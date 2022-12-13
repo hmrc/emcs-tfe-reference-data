@@ -1,12 +1,14 @@
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.internal.util.jdbc.DriverDataSource
 import org.flywaydb.core.internal.util.logging.LogFactory
 import org.flywaydb.core.internal.util.logging.console.{ConsoleLog, ConsoleLogCreator}
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 
 lazy val ItTest = config("it") extend Test
+
+lazy val flywayMigrate = taskKey[Unit]("Initialise databases using flyway")
 
 lazy val microservice = Project("emcs-tfe-reference-data", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
