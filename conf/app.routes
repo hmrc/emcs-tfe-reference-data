@@ -1,4 +1,7 @@
 # microservice specific routes
 
-GET        /hello-world                 uk.gov.hmrc.emcstfereferencedata.controllers.MicroserviceHelloWorldController.hello
-GET        /other-reference-data-list   uk.gov.hmrc.emcstfereferencedata.controllers.EMCSStubController.getOtherDataReferenceList
+GET        /hello-world                         uk.gov.hmrc.emcstfereferencedata.controllers.MicroserviceHelloWorldController.hello
+GET        /other-reference-data-list           uk.gov.hmrc.emcstfereferencedata.controllers.EMCSStubController.getOtherDataReferenceList
+GET        /oracle/connectivity                 uk.gov.hmrc.emcstfereferencedata.controllers.DBConnectivityController.connectivity
+
+POST       /query/:dbName                       uk.gov.hmrc.emcstfereferencedata.controllers.OracleController.query(dbName: String)

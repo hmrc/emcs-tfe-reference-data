@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  */
 
@@ -24,7 +24,8 @@ trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServ
     "microservice.services.emcs-tfe-reference-data-stub.host" -> mockHost,
     "microservice.services.emcs-tfe-reference-data-stub.port" -> mockPort,
     "auditing.consumer.baseUri.host" -> mockHost,
-    "auditing.consumer.baseUri.port" -> mockPort
+    "auditing.consumer.baseUri.port" -> mockPort,
+    "databaseConnections.defaultDatacentre" -> "sdc"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
