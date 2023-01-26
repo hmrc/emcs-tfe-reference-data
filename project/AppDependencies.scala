@@ -5,16 +5,18 @@ import sbt._
 
 object AppDependencies {
 
+  val playSuffix = s"-play-28"
+
+  val boostrapVersion  = "7.12.0"
+  val scalamockVersion = "5.2.0"
+
   val compile = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-backend-play-28"  % "7.3.0"
+    "uk.gov.hmrc" %% s"bootstrap-backend$playSuffix" % boostrapVersion
   )
 
   val test = Seq(
-    "uk.gov.hmrc"             %% "bootstrap-test-play-28"     % "7.3.0"             % "test, it",
-    "org.scalamock"           %% "scalamock" % "5.2.0"        % "test, it",
-    "org.jsoup"               % "jsoup" % "1.15.3"            % Test,
-    "com.vladsch.flexmark"    % "flexmark-all"                % "0.36.8"            % "test, it",
-    "com.github.tomakehurst"  % "wiremock-jre8"               % "2.33.2"            % "it"
-    
+    "uk.gov.hmrc"   %% s"bootstrap-test$playSuffix" % boostrapVersion  % "test, it",
+    "org.scalamock" %% "scalamock"                  % scalamockVersion % "test, it"
+
   )
 }
