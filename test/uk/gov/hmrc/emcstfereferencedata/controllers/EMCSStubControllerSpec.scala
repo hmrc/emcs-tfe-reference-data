@@ -28,10 +28,6 @@ import scala.concurrent.ExecutionContext
 
 class EMCSStubControllerSpec extends UnitSpec with MockEMCSStubService {
 
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-
   private val controller = new EMCSStubController(Helpers.stubControllerComponents(), mockService)
 
 
