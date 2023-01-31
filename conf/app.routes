@@ -2,3 +2,5 @@
 
 GET        /hello-world                 uk.gov.hmrc.emcstfereferencedata.controllers.MicroserviceHelloWorldController.hello
 GET        /other-reference-data-list   uk.gov.hmrc.emcstfereferencedata.controllers.EMCSStubController.getOtherDataReferenceList
+
+GET        /oracle/transportMode        uk.gov.hmrc.emcstfereferencedata.controllers.OracleDBController.show
