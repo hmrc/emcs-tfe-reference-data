@@ -24,7 +24,7 @@ import uk.gov.hmrc.emcstfereferencedata.support.WireMockMethods
 
 import scala.xml.Elem
 
-object ReferenceDataStub extends WireMockMethods {
+trait DownstreamStub extends WireMockMethods {
 
   def onSuccess(method: HTTPMethod, uri: String, status: Int, body: JsValue): StubMapping = {
     when(method = method, uri = uri)
@@ -41,6 +41,9 @@ object ReferenceDataStub extends WireMockMethods {
       .thenReturn(status = status, body)
   }
 
+  def onError(method: HTTPMethod, uri: String, errorStatus: Int): StubMapping =
+    when(method, uri).thenReturn(status = errorStatus)
+
   def onError(method: HTTPMethod, uri: String, errorStatus: Int, errorBody: String): StubMapping = {
     when(method = method, uri = uri)
       .thenReturn(status = errorStatus, errorBody)
@@ -51,3 +54,4 @@ object ReferenceDataStub extends WireMockMethods {
       .thenReturn(status = errorStatus, errorBody)
   }
 }
+object DownstreamStub extends DownstreamStub

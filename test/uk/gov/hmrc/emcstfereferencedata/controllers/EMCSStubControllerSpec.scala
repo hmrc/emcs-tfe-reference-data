@@ -16,23 +16,17 @@
 
 package uk.gov.hmrc.emcstfereferencedata.controllers
 
-import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.FakeAuthAction
 import uk.gov.hmrc.emcstfereferencedata.mocks.service.MockEMCSStubService
 import uk.gov.hmrc.emcstfereferencedata.models.response.OtherDataReferenceListErrorModel
 import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.{validOtherDataReferenceListJson, validOtherDataReferenceListModel}
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.ExecutionContext
+class EMCSStubControllerSpec extends UnitSpec with MockEMCSStubService with FakeAuthAction {
 
-class EMCSStubControllerSpec extends UnitSpec with MockEMCSStubService {
-
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-
-  private val controller = new EMCSStubController(Helpers.stubControllerComponents(), mockService)
+  private val controller = new EMCSStubController(Helpers.stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
 
   "getOtherDataReferenceList" should {

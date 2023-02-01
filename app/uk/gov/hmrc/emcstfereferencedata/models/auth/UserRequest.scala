@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.config
+package uk.gov.hmrc.emcstfereferencedata.models.auth
 
-import com.google.inject.AbstractModule
-import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionImpl}
+import play.api.mvc.{Request, WrappedRequest}
 
-class Module extends AbstractModule {
-
-  override def configure(): Unit = {
-
-    bind(classOf[AppConfig]).asEagerSingleton()
-    bind(classOf[AuthAction]).to(classOf[AuthActionImpl])
-  }
-}
+case class UserRequest[A](request: Request[A],
+                          ern: String,
+                          internalId: String,
+                          credId: String) extends WrappedRequest[A](request)

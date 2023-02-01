@@ -22,13 +22,8 @@ import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReferenceListE
 import uk.gov.hmrc.emcstfereferencedata.services.EMCSStubService
 import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.validOtherDataReferenceListModel
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class EMCSStubServiceSpec extends UnitSpec with MockEMCSStubConnector {
-
-  implicit val hc: HeaderCarrier = HeaderCarrier()
 
   object TestEMCSStubService extends EMCSStubService(mockConnector)
 

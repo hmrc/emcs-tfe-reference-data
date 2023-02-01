@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfereferencedata.stubs.ReferenceDataStub
+import uk.gov.hmrc.emcstfereferencedata.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.xml.Elem
@@ -31,7 +31,7 @@ class EMCSStubControllerIntegrationSpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def uri: String = "/other-reference-data-list"
-    def referenceDataStubUri: String = s"/otherReferenceDataTransportMode"
+    def DownstreamStubUri: String = s"/otherReferenceDataTransportMode"
 
     def request(): WSRequest = {
       setupStubs()
@@ -39,82 +39,100 @@ class EMCSStubControllerIntegrationSpec extends IntegrationBaseSpec {
     }
   }
 
-  "Calling the EMCS stub endpoint" should {
-    "return a success page" when {
-      "all downstream calls are successful" in new Test {
-
-        val validOtherDataReferenceListJson: JsValue = Json.parse(
-          """
-            | {
-            |   "otherRefdata":
-            |     [
-            |       {
-            |          "typeName":"TransportMode",
-            |          "code":"0",
-            |          "description":"Other"
-            |       },
-            |       {
-            |          "typeName":"TransportMode",
-            |          "code":"5",
-            |          "description":"Postal consignment"
-            |       }
-            |     ]
-            | }
-			      |""".stripMargin)
+  "Calling the EMCS stub endpoint" when {
+    "request is unauthorised" must {
+      "return Forbidden" in new Test {
 
         override def setupStubs(): StubMapping = {
-          ReferenceDataStub.onSuccess(ReferenceDataStub.GET, referenceDataStubUri, Status.OK, validOtherDataReferenceListJson)
+          AuthStub.unauthorised()
         }
 
         val response: WSResponse = await(request().get())
-        response.status shouldBe Status.OK
-        response.header("Content-Type") shouldBe Some("application/json")
-        response.body should include("Postal consignment")
+        response.status shouldBe Status.FORBIDDEN
       }
     }
-    "return an error page" when {
-      "downstream call returns unexpected JSON" in new Test {
-        val referenceDataResponseBody: JsValue = Json.parse(
-          s"""
-             |{
-             |   "field": "test message"
-             |}
-             |""".stripMargin
-        )
 
-        override def setupStubs(): StubMapping = {
-          ReferenceDataStub.onSuccess(ReferenceDataStub.GET, referenceDataStubUri, Status.OK, referenceDataResponseBody)
+    "request is authorised" when {
+      "return a success page" when {
+        "all downstream calls are successful" in new Test {
+
+          val validOtherDataReferenceListJson: JsValue = Json.parse(
+            """
+              | {
+              |   "otherRefdata":
+              |     [
+              |       {
+              |          "typeName":"TransportMode",
+              |          "code":"0",
+              |          "description":"Other"
+              |       },
+              |       {
+              |          "typeName":"TransportMode",
+              |          "code":"5",
+              |          "description":"Postal consignment"
+              |       }
+              |     ]
+              | }
+			      |""".stripMargin)
+
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, DownstreamStubUri, Status.OK, validOtherDataReferenceListJson)
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.OK
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.body should include("Postal consignment")
         }
-
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
       }
+      "return an error page" when {
+        "downstream call returns unexpected JSON" in new Test {
+          val referenceDataResponseBody: JsValue = Json.parse(
+            s"""
+               |{
+               |   "field": "test message"
+               |}
+               |""".stripMargin
+          )
 
-      "downstream call returns something other than JSON" in new Test {
-        val referenceDataResponseBody: Elem = <message>test message</message>
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, DownstreamStubUri, Status.OK, referenceDataResponseBody)
+          }
 
-        override def setupStubs(): StubMapping = {
-          ReferenceDataStub.onSuccess(ReferenceDataStub.GET, referenceDataStubUri, Status.OK, referenceDataResponseBody)
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
         }
 
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
-      }
-      "downstream call returns a non-200 HTTP response" in new Test {
-        val referenceDataResponseBody: JsValue = Json.parse(
-          s"""
-             |{
-             |   "message": "test message"
-             |}
-             |""".stripMargin
-        )
+        "downstream call returns something other than JSON" in new Test {
+          val referenceDataResponseBody: Elem = <message>test message</message>
 
-        override def setupStubs(): StubMapping = {
-          ReferenceDataStub.onSuccess(ReferenceDataStub.GET, referenceDataStubUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, DownstreamStubUri, Status.OK, referenceDataResponseBody)
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
         }
+        "downstream call returns a non-200 HTTP response" in new Test {
+          val referenceDataResponseBody: JsValue = Json.parse(
+            s"""
+               |{
+               |   "message": "test message"
+               |}
+               |""".stripMargin
+          )
 
-        val response: WSResponse = await(request().get())
-        response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+            DownstreamStub.onSuccess(DownstreamStub.GET, DownstreamStubUri, Status.INTERNAL_SERVER_ERROR, referenceDataResponseBody)
+          }
+
+          val response: WSResponse = await(request().get())
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+        }
       }
     }
   }

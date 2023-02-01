@@ -29,9 +29,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MicroserviceHelloWorldControllerSpec extends UnitSpec with MockEMCSStubConnector {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-
   private val fakeRequest = FakeRequest("GET", "/hello-world")
   private val controller = new MicroserviceHelloWorldController(Helpers.stubControllerComponents(), mockConnector)
 
