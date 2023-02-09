@@ -41,7 +41,7 @@ class OracleDBConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
 
       reportResults.asInstanceOf[OtherDataReferenceList] shouldBe OtherDataReferenceList(
         List(
-          OtherDataReference("transportMode", "2", "mode")
+          OtherDataReference("TransportMode", "2", "mode")
         )
       )
     }

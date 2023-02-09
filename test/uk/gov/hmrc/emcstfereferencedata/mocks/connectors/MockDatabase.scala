@@ -28,14 +28,11 @@ trait MockDatabase extends MockFactory {
       val mockResultSet = mock[ResultSet]
       val mockResultSetMetaData = mock[ResultSetMetaData]
 
-        (() => mockResultSet.getMetaData()).expects().returns(mockResultSetMetaData)
-
-
-
-        (() =>mockResultSetMetaData.getColumnCount).expects().returns(columnNames.size)
+        (() => mockResultSet.getMetaData()).expects().returns(mockResultSetMetaData).anyNumberOfTimes()
+        (() =>mockResultSetMetaData.getColumnCount).expects().returns(columnNames.size).anyNumberOfTimes()
 
       def getColumnName(indexPosition: Int): CallHandler1[Int, String] = {
-        (mockResultSetMetaData.getColumnClassName(_: Int)).expects(indexPosition).returns(columnNames(indexPosition - 1))
+        (mockResultSetMetaData.getColumnClassName(_: Int)).expects(indexPosition).returns(columnNames(indexPosition - 1)).noMoreThanOnce()
       }
 
 
@@ -45,7 +42,7 @@ trait MockDatabase extends MockFactory {
 
 
       def getColumnValues(indexPosition: Int, rowLevelValues: Seq[String]): CallHandler1[Int, String] = {
-        (mockResultSet.getString(_: Int)).expects(indexPosition).returns(rowLevelValues(indexPosition - 1))
+        (mockResultSet.getString(_: Int)).expects(indexPosition).returns(rowLevelValues(indexPosition - 1)).noMoreThanOnce()
       }
 
       def getRowValues(columnSize: Int, rowLevelValues: Seq[String]): Unit = {
@@ -54,40 +51,28 @@ trait MockDatabase extends MockFactory {
         )
       }
 
-      println(Console.MAGENTA + rowValues + Console.RESET)
-
         rowValues match {
           case Some(rowLevelValues) =>
             getRowValues(columnNames.size, rowLevelValues)
-            (() => mockResultSet.isBeforeFirst).expects().returns(true).returns(false)
-            (() => mockResultSet.next).expects().returns(true).returns(false)
-            (() => mockResultSet.getRow).expects().returns(1)
+            (() => mockResultSet.isBeforeFirst).expects().returns(true).noMoreThanOnce()
+            (() => mockResultSet.isBeforeFirst).expects().returns(false).anyNumberOfTimes()
+            (() => mockResultSet.next).expects().returns(true).noMoreThanOnce()
+            (() => mockResultSet.next).expects().returns(false).anyNumberOfTimes()
+            (() => mockResultSet.getRow).expects().returns(1).anyNumberOfTimes()
           case None =>
-            (() => mockResultSet.isBeforeFirst).expects().returns(false)
-            (() => mockResultSet.next()).expects().returns(true)
+            (() => mockResultSet.isBeforeFirst).expects().returns(false).anyNumberOfTimes()
+            (() => mockResultSet.next()).expects().returns(true).anyNumberOfTimes()
 
 
         }
 
+      (mockDatabase.getConnection(_: Boolean)).expects(*).returns(mockConnection).anyNumberOfTimes()
+      (() => mockConnection.createStatement()).expects().returns(mockStatement).anyNumberOfTimes()
+      (mockStatement.executeQuery(_: String)).expects(*).returns(mockResultSet).anyNumberOfTimes()
 
-
-
-        (mockDatabase.getConnection(_: Boolean)).expects(*).returns(mockConnection)
-
-
-
-        (() => mockConnection.createStatement()).expects().returns(mockStatement)
-
-
-
-        (mockStatement.executeQuery(_: String)).expects(*).returns(mockResultSet)
-
-
-
-
-//      doNothing().when(mockConnection).rollback()
-//      doNothing().when(mockConnection).commit()
-//      doNothing().when(mockConnection).close()
+      (() => mockConnection.rollback()).expects().returns({}).anyNumberOfTimes()
+      (() => mockConnection.commit()).expects().returns({}).anyNumberOfTimes()
+      (() => mockConnection.close()).expects().returns({}).anyNumberOfTimes()
     }
   }
 }

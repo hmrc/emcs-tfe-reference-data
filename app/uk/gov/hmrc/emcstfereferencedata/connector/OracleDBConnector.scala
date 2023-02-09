@@ -29,11 +29,13 @@ class OracleDBConnector @Inject()(db: Database, config: AppConfig, system: Actor
         val rowDetails = (1 to columnCount).map(rs.getString).mkString("", ",","")
         val response = if (rs.getRow==1) rowDetails; else rowDetails
 
+        println(Console.MAGENTA_B + rowDetails + Console.RESET)
         available = rs.next()
 
         response
       }
     })
+
 
     result._2.map(_.split(",")).map(
       row => OtherDataReference( "TransportMode", row(1), row(0))
