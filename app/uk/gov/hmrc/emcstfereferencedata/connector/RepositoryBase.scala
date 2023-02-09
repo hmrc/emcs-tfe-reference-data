@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 
 abstract class RepositoryBase(db: Database, config: AppConfig, system: ActorSystem) {
 
-  implicit val ec: ExecutionContext = system.dispatchers.lookup("database.dispatcher")
+  lazy implicit val ec: ExecutionContext = system.dispatchers.lookup("database.dispatcher")
 
   private lazy val appLogging = if (config.appLogging) "Y" else "N"
   lazy val transactionTimeoutSeconds = config.transactionTimeout.toSeconds.toInt
