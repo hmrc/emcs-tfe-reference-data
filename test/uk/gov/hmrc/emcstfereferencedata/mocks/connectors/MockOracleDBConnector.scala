@@ -18,7 +18,7 @@ trait MockOracleDBConnector extends MockFactory {
 
   object MockConnector {
     def executeTransportModeOptionList(response: OtherDataReferenceListResponseModel): CallHandler0[Future[OtherDataReferenceListResponseModel]] = {
-      (mockConnector.executeTransportModeOptionList()).returns(response)
+      (() => mockConnector.executeTransportModeOptionList()).expects().returns(Future.successful(response))
     }
     }
 }

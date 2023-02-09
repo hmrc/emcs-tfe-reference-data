@@ -24,7 +24,7 @@ class OracleDBControllerSpec extends UnitSpec with MockOracleDBConnector {
   "getOtherDataReferenceList" should {
     s"return $OK with the retrieved payment details from the charge details" when {
       "the service returns the other reference data" in {
-        MockConnector.executeTransportModeOptionList
+        MockConnector.executeTransportModeOptionList(validOtherDataReferenceListModel)
 
         val result = controller.show()(FakeRequest())
 

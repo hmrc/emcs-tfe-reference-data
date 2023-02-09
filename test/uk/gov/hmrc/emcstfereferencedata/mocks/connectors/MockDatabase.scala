@@ -9,6 +9,7 @@ package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 import org.scalamock.handlers.{CallHandler0, CallHandler1, CallHandler2}
 import org.scalamock.scalatest.MockFactory
 import play.api.db.Database
+
 import org.scalatest.matchers._
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,32 +28,66 @@ trait MockDatabase extends MockFactory {
       val mockResultSet = mock[ResultSet]
       val mockResultSetMetaData = mock[ResultSetMetaData]
 
-      def getMetaData(): CallHandler0[ResultSetMetaData] = {
-        (mockResultSet.getMetaData()).returns(mockResultSetMetaData)
+        (() => mockResultSet.getMetaData()).expects().returns(mockResultSetMetaData)
+
+
+
+        (() =>mockResultSetMetaData.getColumnCount).expects().returns(columnNames.size)
+
+      def getColumnName(indexPosition: Int): CallHandler1[Int, String] = {
+        (mockResultSetMetaData.getColumnClassName(_: Int)).expects(indexPosition).returns(columnNames(indexPosition - 1))
       }
 
 
-      when(mockResultSetMetaData.getColumnCount).thenReturn(columnNames.size)
+        (1 to columnNames.size).foreach(
+          x => getColumnName(x)
+        )
 
-      (1 to columnNames.size).foreach(x => when(mockResultSetMetaData.getColumnName(x)).thenReturn(columnNames(x-1)))
 
-      rowValues match {
-        case Some(rowLevelValues) =>
-          (1 to columnNames.size).foreach(x => when(mockResultSet.getString(x)).thenReturn(rowLevelValues(x-1)))
-
-          when(mockResultSet.isBeforeFirst).thenReturn(true).thenReturn(false)
-          when(mockResultSet.next()).thenReturn(true).thenReturn(false)
-          when(mockResultSet.getRow).thenReturn(1)
-
-        case None =>
-          when(mockResultSet.isBeforeFirst).thenReturn(false)
-          when(mockResultSet.next()).thenReturn(false)
+      def getColumnValues(indexPosition: Int, rowLevelValues: Seq[String]): CallHandler1[Int, String] = {
+        (mockResultSet.getString(_: Int)).expects(indexPosition).returns(rowLevelValues(indexPosition - 1))
       }
 
+      def getRowValues(columnSize: Int, rowLevelValues: Seq[String]): Unit = {
+        (1 to columnSize).foreach(
+          x => getColumnValues(x, rowLevelValues)
+        )
+      }
 
-      (mockDatabase.getConnection.expects(*)).returns(mockConnection)
-      (mockConnection.createStatement()).returns(mockStatement)
-      (mockStatement.executeQuery().expects(*)).returns(mockResultSet)
+      println(Console.MAGENTA + rowValues + Console.RESET)
+
+        rowValues match {
+          case Some(rowLevelValues) =>
+            getRowValues(columnNames.size, rowLevelValues)
+            (() => mockResultSet.isBeforeFirst).expects().returns(true).returns(false)
+            (() => mockResultSet.next).expects().returns(true).returns(false)
+            (() => mockResultSet.getRow).expects().returns(1)
+          case None =>
+            (() => mockResultSet.isBeforeFirst).expects().returns(false)
+            (() => mockResultSet.next()).expects().returns(true)
+
+
+        }
+
+
+
+
+        (mockDatabase.getConnection(_: Boolean)).expects(*).returns(mockConnection)
+
+
+
+        (() => mockConnection.createStatement()).expects().returns(mockStatement)
+
+
+
+        (mockStatement.executeQuery(_: String)).expects(*).returns(mockResultSet)
+
+
+
+
+//      doNothing().when(mockConnection).rollback()
+//      doNothing().when(mockConnection).commit()
+//      doNothing().when(mockConnection).close()
     }
   }
 }

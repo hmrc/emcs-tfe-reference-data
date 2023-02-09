@@ -6,11 +6,10 @@
 package uk.gov.hmrc.emcstfereferencedata.connector
 
 import akka.actor.ActorSystem
-import akka.util.ByteString
 import play.api.Logging
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import play.api.db.Database
-import uk.gov.hmrc.emcstfereferencedata.models.response.TransportModeSQLResult
+import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, OtherDataReferenceList, OtherDataReferenceListResponseModel}
 
 import java.sql.{Connection, ResultSet}
 import javax.inject.Inject
@@ -18,28 +17,32 @@ import scala.concurrent.{Future, blocking}
 
 class OracleDBConnector @Inject()(db: Database, config: AppConfig, system: ActorSystem) extends RepositoryBase(db, config, system) with Logging {
 
-  def makeCSVIterator(rs: ResultSet): (Boolean, Iterator[ByteString]) = {
-    (rs.isBeforeFirst, new Iterator[ByteString] {
+  def readFromOracleDB(rs: ResultSet): List[OtherDataReference]= {
+    val result = (rs.isBeforeFirst, new Iterator[String] {
       private var available: Boolean = rs.next()
 
       val columnCount: Int = rs.getMetaData.getColumnCount
 
-      val columnNames: String = (1 to columnCount).map(rs.getMetaData.getColumnName).mkString("",",","\n")
-
       def hasNext: Boolean = available
 
-      def next(): ByteString = {
-        val rowDetails = (1 to columnCount).map(rs.getString).mkString("", ",", "\n")
-        val response = if (rs.getRow==1) columnNames ++ rowDetails; else rowDetails
+      def next(): String = {
+        val rowDetails = (1 to columnCount).map(rs.getString).mkString("", ",","")
+        val response = if (rs.getRow==1) rowDetails; else rowDetails
 
         available = rs.next()
 
-        ByteString(response)
+        response
       }
     })
+
+    result._2.map(_.split(",")).map(
+      row => OtherDataReference( "TransportMode", row(1), row(0))
+    ).toList
+
+
   }
 
-  def executeTransportMode(): Future[TransportModeSQLResult] = Future(blocking {
+  def executeTransportModeOptionList(): Future[OtherDataReferenceListResponseModel] = Future(blocking {
     val connection = db.getConnection(autocommit = false)
 
 
@@ -48,10 +51,10 @@ class OracleDBConnector @Inject()(db: Database, config: AppConfig, system: Actor
     logger.debug(s"[OracleDBConnector][executeTransportMode] - SQL statement = $sqlStatement")
 
     try {
-      val rs: ResultSet                   = connection.createStatement.executeQuery(sqlStatement)
-      val (containsRows, iterator)        = makeCSVIterator(rs)
+      val rs: ResultSet              = connection.createStatement.executeQuery(sqlStatement)
+      val (transportModeList)        = readFromOracleDB(rs)
 
-      TransportModeSQLResult(iterator.map(_.toString()).toList, containsRows)
+      OtherDataReferenceList(transportModeList)
     } catch {
       case e: Throwable =>
         connection.rollback()

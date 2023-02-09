@@ -20,22 +20,22 @@ import scala.concurrent.ExecutionContext
 
 class OracleDBConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockDatabase {
 
-  trait Test {
+  class Test( columnNames: Seq[String] = Seq("A", "B", "C"),
+              rowValues: Option[Seq[String]] = Some(Seq("mode", "2", "transportMode"))
+            ) {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
     val connector = new OracleDBConnector(mockDatabase, mockAppConfig, app.actorSystem)
 
-    val baseUrl: String = "http://test-BaseUrl"
-    MockedAppConfig.referenceDataBaseUrl.returns(baseUrl)
+    MockedDatabase.mockADatabaseAndResultSet(
+      columnNames = columnNames,
+      rowValues = rowValues
+    )
   }
 
   "executeTransportModeOptionList" should {
 
-    "return CSV data when records found" in new Test {
-      MockedDatabase.mockADatabaseAndResultSet(
-        columnNames = Seq("A", "B", "C"),
-        rowValues   = Some(Seq("mode", "2", "transportMode"))
-      )
+    "return transport mode list" in new Test() {
 
       val reportResults: OtherDataReferenceListResponseModel = await(connector.executeTransportModeOptionList())
 
@@ -46,13 +46,7 @@ class OracleDBConnectorSpec extends UnitSpec with Status with MimeTypes with Hea
       )
     }
 
-    "return an indication that no data has been found" in new Test {
-      MockedDatabase.mockADatabaseAndResultSet(
-        columnNames = Seq("A", "B", "C"),
-        rowValues   = None
-      )
-
-
+    "return an indication that no data has been found" in new Test(rowValues = None) {
       val reportResults: OtherDataReferenceListResponseModel = await(connector.executeTransportModeOptionList())
 
       reportResults.asInstanceOf[OtherDataReferenceList].otherRefdata.isEmpty shouldBe true
