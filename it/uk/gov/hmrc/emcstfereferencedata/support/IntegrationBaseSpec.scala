@@ -25,16 +25,18 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
 import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfereferencedata.utils.Logging
 
 trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite
-  with BeforeAndAfterEach with BeforeAndAfterAll {
+  with BeforeAndAfterEach with BeforeAndAfterAll with Logging {
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 
   def servicesConfig: Map[String, _] = Map(
     "microservice.services.auth.port" -> WireMockHelper.wireMockPort,
     "microservice.services.emcs-tfe-reference-data-stub.port" -> WireMockHelper.wireMockPort,
-    "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort
+    "auditing.consumer.baseUri.port" -> WireMockHelper.wireMockPort,
+    "play.ws.timeout.request" -> "3minutes"
   )
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
