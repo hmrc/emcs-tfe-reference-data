@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.config
+package uk.gov.hmrc.emcstfereferencedata.connector
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import akka.actor.ActorSystem
+import play.api.db.Database
+import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 
-import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
 
-@Singleton
-class AppConfig @Inject()(servicesConfig :ServicesConfig, config: Configuration) {
+abstract class RepositoryBase(db: Database, config: AppConfig, system: ActorSystem) {
 
-  def stubUrl(): String = servicesConfig.baseUrl("emcs-tfe-reference-data-stub")
-
+  lazy implicit val ec: ExecutionContext = system.dispatchers.lookup("database.dispatcher")
 }

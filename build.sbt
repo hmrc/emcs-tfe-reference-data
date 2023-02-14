@@ -1,5 +1,5 @@
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
+
 
 lazy val ItTest = config("it") extend Test
 
@@ -14,11 +14,11 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
   )
-  .settings(publishingSettings: _*)
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings): _*)
   .settings(
-    ItTest / fork := true,
+    Test / fork := false,
+    ItTest / fork := false,
     ItTest / unmanagedSourceDirectories := Seq((ItTest / baseDirectory).value / "it"),
     ItTest / unmanagedClasspath += baseDirectory.value / "resources",
     Runtime / unmanagedClasspath += baseDirectory.value / "resources",
@@ -26,7 +26,5 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     ItTest / parallelExecution := false,
     addTestReportOption(ItTest, "int-test-reports")
   )
-  .settings(integrationTestSettings(): _*)
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 8312)
