@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.emcstfereferencedata.controllers
 
+import play.api.http.Status
+import play.api.test.Helpers.{OK, contentAsJson, contentAsString, status}
 import play.api.test.{FakeRequest, Helpers}
-import play.api.test.Helpers.{OK, contentAsJson, status}
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockOracleDBConnector
-import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.{validOtherDataReferenceListJson, validOtherDataReferenceListModel}
+import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.{clientErrorResponse, serverErrorResponse, validOtherDataReferenceListJson, validOtherDataReferenceListModel}
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
-import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext
 
 class OracleDBControllerSpec extends UnitSpec with MockOracleDBConnector {
 
@@ -35,10 +33,32 @@ class OracleDBControllerSpec extends UnitSpec with MockOracleDBConnector {
       "the service returns the other reference data" in {
         MockConnector.executeTransportModeOptionList(validOtherDataReferenceListModel)
 
-        val result = controller.show()(FakeRequest())
+        val result = controller.show()(fakeRequest)
 
         status(result) shouldBe OK
         contentAsJson(result) shouldBe validOtherDataReferenceListJson
+      }
+    }
+
+    s"return a client error response" when {
+      "the service returns a client error" in {
+        MockConnector.executeTransportModeOptionList(clientErrorResponse)
+
+        val result = controller.show()(fakeRequest)
+
+        status(result) shouldBe clientErrorResponse.status
+        contentAsString(result) shouldBe clientErrorResponse.reason
+      }
+    }
+
+    s"return a server error response" when {
+      "the service returns a server error" in {
+        MockConnector.executeTransportModeOptionList(serverErrorResponse)
+
+        val result = controller.show()(fakeRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsString(result) shouldBe "Failed to retrieve other data reference list"
       }
     }
   }

@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connectors
 
-import akka.actor.ActorSystem
 import play.api.http.{HeaderNames, MimeTypes, Status}
 import uk.gov.hmrc.emcstfereferencedata.connector.OracleDBConnector
 import uk.gov.hmrc.emcstfereferencedata.mocks.config.MockAppConfig
@@ -25,8 +24,6 @@ import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, Oth
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 import uk.gov.hmrc.http.HeaderCarrier
 
-import java.sql.{Connection, ResultSet, ResultSetMetaData, Statement}
-import scala.Option.when
 import scala.concurrent.ExecutionContext
 
 class OracleDBConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockDatabase {

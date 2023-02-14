@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.emcstfereferencedata.support
 
+import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, OtherDataReferenceList}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, OtherDataReferenceList, OtherDataReferenceListErrorModel}
 
 object OtherDataReferenceListFixture {
 
@@ -60,5 +61,8 @@ object OtherDataReferenceListFixture {
   val validOtherDataReferenceListModel = OtherDataReferenceList(
     List(validOtherDataReferenceModel1,validOtherDataReferenceModel2)
   )
+
+  val clientErrorResponse = OtherDataReferenceListErrorModel(Status.BAD_REQUEST, "bang")
+  val serverErrorResponse = OtherDataReferenceListErrorModel(Status.INTERNAL_SERVER_ERROR, "bang")
 
 }

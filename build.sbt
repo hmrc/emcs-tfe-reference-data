@@ -26,14 +26,5 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     ItTest / parallelExecution := false,
     addTestReportOption(ItTest, "int-test-reports")
   )
-  .settings(resolvers ++= Seq(
-    "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/",
-    "third-party-maven-releases" at "https://artefacts.tax.service.gov.uk/artifactory/third-party-maven-releases/"))
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 8312)
-
-//flywayLocations := envConfig.value.getStringList("flywayLocations").asScala
-//flywayDriver := envConfig.value.getString("jdbcDriver")Resolver.jcenterRepo
-//flywayUrl := envConfig.value.getString("jdbcUrl")
-//flywayUser := envConfig.value.getString("jdbcUserName")
-//flywayPassword := envConfig.value.getString("jdbcPassword")

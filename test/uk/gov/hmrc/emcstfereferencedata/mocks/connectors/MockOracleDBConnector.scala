@@ -20,9 +20,8 @@ import org.scalamock.handlers.CallHandler0
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfereferencedata.connector.OracleDBConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.OtherDataReferenceListResponseModel
-import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait MockOracleDBConnector extends MockFactory {
   lazy val mockConnector: OracleDBConnector = mock[OracleDBConnector]
