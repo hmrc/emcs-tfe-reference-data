@@ -1,14 +1,7 @@
-import org.flywaydb.core.Flyway
-import org.flywaydb.core.internal.util.jdbc.DriverDataSource
-import org.flywaydb.core.internal.util.logging.LogFactory
-import org.flywaydb.core.internal.util.logging.console.{ConsoleLog, ConsoleLogCreator}
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 
 
 lazy val ItTest = config("it") extend Test
-
-lazy val flywayMigrate = taskKey[Unit]("Initialise databases using flyway")
 
 lazy val microservice = Project("emcs-tfe-reference-data", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -21,11 +14,11 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
   )
-  .settings(publishingSettings: _*)
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.itSettings): _*)
   .settings(
-    ItTest / fork := true,
+    Test / fork := false,
+    ItTest / fork := false,
     ItTest / unmanagedSourceDirectories := Seq((ItTest / baseDirectory).value / "it"),
     ItTest / unmanagedClasspath += baseDirectory.value / "resources",
     Runtime / unmanagedClasspath += baseDirectory.value / "resources",
@@ -33,20 +26,6 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     ItTest / parallelExecution := false,
     addTestReportOption(ItTest, "int-test-reports")
   )
-  .settings(flywayMigrate := {
-    LogFactory.setLogCreator(new ConsoleLogCreator(ConsoleLog.Level.INFO))
-    val f = new Flyway()
-    f.setLocations("filesystem:test/resources/database/migrations/sql")
-    f.setDataSource(new DriverDataSource(
-      Class.forName("oracle.jdbc.OracleDriver").getClassLoader,
-      "oracle.jdbc.driver.OracleDriver",
-      "jdbc:oracle:thin:@localhost:1521:XE",
-      "sys as sysdba",
-      "oracle"))
-    f.setBaselineOnMigrate(true)
-    f.migrate()
-  })
-  .settings(integrationTestSettings(): _*)
   .settings(resolvers ++= Seq(
     "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/",
     "third-party-maven-releases" at "https://artefacts.tax.service.gov.uk/artifactory/third-party-maven-releases/"))
