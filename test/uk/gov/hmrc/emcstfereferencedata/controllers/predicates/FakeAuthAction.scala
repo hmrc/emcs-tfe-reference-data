@@ -33,6 +33,6 @@ trait FakeAuthAction extends StubBodyParserFactory with BaseFixtures { _: UnitSp
     override def parser: BodyParser[AnyContent] = stubBodyParser()
 
     override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] =
-      block(UserRequest(request, ern, testInternalId, testCredId))
+      block(UserRequest(request, testInternalId, testCredId))
   }
 }

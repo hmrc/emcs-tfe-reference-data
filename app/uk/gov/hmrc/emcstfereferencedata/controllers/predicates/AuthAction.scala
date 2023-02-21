@@ -80,20 +80,14 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
                                                 credId: String
                                                )(block: UserRequest[A] => Future[Result])
                                                (implicit request: Request[A]): Future[Result] =
-    enrolments.enrolments.find(_.key == EnrolmentKeys.EMCS_ENROLMENT) match {
-      case Some(enrolment) if enrolment.isActivated =>
-        enrolment.identifiers.find(_.key == EnrolmentKeys.ERN).map(_.value) match {
-          case Some(ern) =>
-            block(UserRequest(request, ern, internalId, credId))
-          case None =>
-            logger.error(s"[checkOrganisationEMCSEnrolment] Could not find ${EnrolmentKeys.ERN} from the ${EnrolmentKeys.EMCS_ENROLMENT} enrolment")
-            Future.successful(Forbidden)
-        }
-      case Some(enrolment) if !enrolment.isActivated =>
-        logger.debug(s"[checkOrganisationEMCSEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
-        Future.successful(Forbidden)
-      case _ =>
+    enrolments.enrolments.filter(enrolment => enrolment.key == EnrolmentKeys.EMCS_ENROLMENT) match {
+      case emcsEnrolments if emcsEnrolments.isEmpty =>
         logger.debug(s"[checkOrganisationEMCSEnrolment] No ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found")
         Future.successful(Forbidden)
+      case emcsEnrolments =>
+        if(emcsEnrolments.exists(_.isActivated)) block(UserRequest(request, internalId, credId)) else {
+          logger.debug(s"[checkOrganisationEMCSEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
+          Future.successful(Forbidden)
+        }
     }
 }
