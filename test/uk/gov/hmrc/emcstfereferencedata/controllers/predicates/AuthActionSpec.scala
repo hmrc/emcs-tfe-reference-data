@@ -152,38 +152,27 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
               }
             }
 
-            s"Enrolments exists for ${EnrolmentKeys.EMCS_ENROLMENT} AND is activated" when {
+            s"At least one Enrolment exists for ${EnrolmentKeys.EMCS_ENROLMENT} that is activated" must {
 
-              s"the ${EnrolmentKeys.ERN} identifier is missing (should be impossible)" must {
+              "allow the User through, returning a 200 (OK)" in new Harness {
 
-                "redirect to unauthorised" in new Harness {
+                override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                  Enrolment(
+                    key = EnrolmentKeys.EMCS_ENROLMENT,
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    state = EnrolmentKeys.ACTIVATED
+                  ), Enrolment(
+                    key = EnrolmentKeys.EMCS_ENROLMENT,
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    state = EnrolmentKeys.ACTIVATED
+                  ), Enrolment(
+                    key = EnrolmentKeys.EMCS_ENROLMENT,
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    state = EnrolmentKeys.ACTIVATED
+                  )
+                ))))
 
-                  override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
-                    Enrolment(
-                      key = EnrolmentKeys.EMCS_ENROLMENT,
-                      identifiers = Seq(),
-                      state = EnrolmentKeys.ACTIVATED
-                    )
-                  ))))
-
-                  status(result) shouldBe FORBIDDEN
-                }
-              }
-
-              s"the ${EnrolmentKeys.ERN} identifier is present" must {
-
-                "allow the User through, returning a 200 (OK)" in new Harness {
-
-                  override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
-                    Enrolment(
-                      key = EnrolmentKeys.EMCS_ENROLMENT,
-                      identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
-                      state = EnrolmentKeys.ACTIVATED
-                    )
-                  ))))
-
-                  status(result) shouldBe OK
-                }
+                status(result) shouldBe OK
               }
             }
           }
