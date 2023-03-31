@@ -62,9 +62,9 @@ class LoggingSpec extends PlaySpec with LogCapturing {
     val msg = s"$level Message"
     level match {
       case Level.DEBUG => ex.fold(logger.debug(msg))(logger.debug(msg, _))
-      case Level.INFO =>  ex.fold(logger.info(msg))(logger.info(msg, _))
-      case Level.WARN =>  ex.fold(logger.warn(msg))(logger.warn(msg, _))
-      case _ =>           ex.fold(logger.error(msg))(logger.error(msg, _))
+      case Level.INFO => ex.fold(logger.info(msg))(logger.info(msg, _))
+      case Level.WARN => ex.fold(logger.warn(msg))(logger.warn(msg, _))
+      case _ => ex.fold(logger.error(msg))(logger.error(msg, _))
     }
     level
   }

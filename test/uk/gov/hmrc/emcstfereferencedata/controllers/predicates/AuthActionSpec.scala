@@ -45,6 +45,7 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
 
     val authConnector: AuthConnector
     lazy val authAction = new AuthActionImpl(authConnector, bodyParsers)
+
     def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
 
     lazy val result = onPageLoad()(fakeRequest)
@@ -54,7 +55,7 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
                    enrolments: Enrolments = Enrolments(Set.empty),
                    internalId: Option[String] = Some(testInternalId),
                    credId: Option[Credentials] = Some(Credentials(testCredId, "gg"))): AuthRetrieval =
-    new ~(new ~(new ~(affinityGroup, enrolments), internalId), credId)
+    new~(new~(new~(affinityGroup, enrolments), internalId), credId)
 
   "AuthAction" when {
 
@@ -143,7 +144,7 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
                 override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
                   Enrolment(
                     key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
                     state = EnrolmentKeys.INACTIVE
                   )
                 ))))
@@ -159,15 +160,15 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
                 override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
                   Enrolment(
                     key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
                     state = EnrolmentKeys.ACTIVATED
                   ), Enrolment(
                     key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
                     state = EnrolmentKeys.ACTIVATED
                   ), Enrolment(
                     key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, ern)),
+                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
                     state = EnrolmentKeys.ACTIVATED
                   )
                 ))))

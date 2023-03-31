@@ -24,7 +24,8 @@ import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait FakeAuthAction extends StubBodyParserFactory with BaseFixtures { _: UnitSpec =>
+trait FakeAuthAction extends StubBodyParserFactory with BaseFixtures {
+  _: UnitSpec =>
 
   object FakeSuccessAuthAction extends AuthAction {
 

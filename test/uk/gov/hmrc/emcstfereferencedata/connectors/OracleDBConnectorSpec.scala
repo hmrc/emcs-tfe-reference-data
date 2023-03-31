@@ -28,12 +28,12 @@ import scala.concurrent.ExecutionContext
 
 class OracleDBConnectorSpec extends UnitSpec with Status with MimeTypes with HeaderNames with MockAppConfig with MockHttpClient with MockDatabase {
 
-  class Test( columnNames: Seq[String] = Seq("A", "B", "C"),
-              rowValues: Option[Seq[String]] = Some(Seq("mode", "2", "transportMode"))
+  class Test(columnNames: Seq[String] = Seq("A", "B", "C"),
+             rowValues: Option[Seq[String]] = Some(Seq("mode", "2", "transportMode"))
             ) {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-    val connector = new OracleDBConnector(mockDatabase, mockAppConfig, app.actorSystem)
+    val connector = new OracleDBConnector(mockDatabase, app.actorSystem)
 
     MockedDatabase.mockADatabaseAndResultSet(
       columnNames = columnNames,

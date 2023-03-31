@@ -29,14 +29,17 @@ import scala.concurrent.ExecutionContext
 @Singleton()
 class EMCSStubController @Inject()(cc: ControllerComponents,
                                    service: EMCSStubService,
-                                   authAction: AuthAction)
-                                  (implicit ec: ExecutionContext) extends BackendController(cc){
+                                   authAction: AuthAction
+                                  )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
-  def getOtherDataReferenceList(): Action[AnyContent] = authAction.async { implicit request =>
+  def getOtherDataReferenceList: Action[AnyContent] = authAction.async { implicit request =>
     service.getOtherDataReferenceList map {
-      case response:  OtherDataReferenceList => Ok(Json.toJson(response))
-      case error: OtherDataReferenceListErrorModel if error.status >= 400 && error.status < 500 => Status(error.status)(error.reason)
-      case _ => InternalServerError("Failed to retrieve other data reference list")
+      case response: OtherDataReferenceList =>
+        Ok(Json.toJson(response))
+      case error: OtherDataReferenceListErrorModel if error.status >= 400 && error.status < 500 =>
+        Status(error.status)(error.reason)
+      case _ =>
+        InternalServerError("Failed to retrieve other data reference list")
     }
   }
 

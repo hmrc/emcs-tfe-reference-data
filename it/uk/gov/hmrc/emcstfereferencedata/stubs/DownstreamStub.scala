@@ -17,7 +17,6 @@
 package uk.gov.hmrc.emcstfereferencedata.stubs
 
 
-
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.emcstfereferencedata.support.WireMockMethods
@@ -54,4 +53,5 @@ trait DownstreamStub extends WireMockMethods {
       .thenReturn(status = errorStatus, errorBody)
   }
 }
+
 object DownstreamStub extends DownstreamStub

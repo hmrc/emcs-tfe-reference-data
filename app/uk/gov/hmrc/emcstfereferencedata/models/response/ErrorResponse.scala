@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.config
+package uk.gov.hmrc.emcstfereferencedata.models.response
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OWrites}
 
-import javax.inject.{Inject, Singleton}
+sealed trait ErrorResponse {
+  val message: String
+}
 
-@Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, config: Configuration) {
+object ErrorResponse {
 
-  def stubUrl(): String = servicesConfig.baseUrl("emcs-tfe-reference-data-stub")
+  implicit val writes: OWrites[ErrorResponse] = (o: ErrorResponse) => Json.obj("message" -> o.message)
+
+  implicit def genericWrites[T <: ErrorResponse]: OWrites[T] =
+    writes.contramap[T](c => c: ErrorResponse)
+
+  case object NoDataReturnedFromDatabaseError extends ErrorResponse {
+    val message = "The database returned no data for the specified field/s"
+  }
 
 }

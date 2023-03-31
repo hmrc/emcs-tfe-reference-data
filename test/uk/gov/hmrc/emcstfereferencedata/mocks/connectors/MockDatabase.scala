@@ -27,7 +27,7 @@ trait MockDatabase extends MockFactory {
   val mockDatabase: Database = mock[Database]
 
   object MockedDatabase extends MockFactory {
-    def mockADatabaseAndResultSet(columnNames: Seq[String], rowValues:Option[Seq[String]]): Unit = {
+    def mockADatabaseAndResultSet(columnNames: Seq[String], rowValues: Option[Seq[String]]): Unit = {
       val mockConnection = mock[Connection]
       val mockStatement = mock[Statement]
       val mockResultSet = mock[ResultSet]
@@ -36,11 +36,11 @@ trait MockDatabase extends MockFactory {
       (() => mockResultSet.getMetaData).expects().returns(mockResultSetMetaData).anyNumberOfTimes()
       (() => mockResultSetMetaData.getColumnCount).expects().returns(columnNames.size).anyNumberOfTimes()
 
-      (1 to columnNames.size).foreach(x => (mockResultSetMetaData.getColumnName(_: Int)).expects(x).returns(columnNames(x-1)).noMoreThanOnce())
+      (1 to columnNames.size).foreach(x => (mockResultSetMetaData.getColumnName(_: Int)).expects(x).returns(columnNames(x - 1)).noMoreThanOnce())
 
       rowValues match {
         case Some(rowLevelValues) =>
-          (1 to columnNames.size).foreach(x => (mockResultSet.getString(_: Int)).expects(x).returns(rowLevelValues(x-1)).noMoreThanOnce())
+          (1 to columnNames.size).foreach(x => (mockResultSet.getString(_: Int)).expects(x).returns(rowLevelValues(x - 1)).noMoreThanOnce())
 
           (() => mockResultSet.isBeforeFirst()).expects().returns(true).noMoreThanOnce()
           (() => mockResultSet.isBeforeFirst()).expects().returns(false).anyNumberOfTimes()
