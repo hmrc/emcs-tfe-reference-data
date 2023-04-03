@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata
+package uk.gov.hmrc.emcstfereferencedata.services
 
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockEMCSStubConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReferenceListErrorModel, OtherDataReferenceListResponseModel}
-import uk.gov.hmrc.emcstfereferencedata.services.EMCSStubService
 import uk.gov.hmrc.emcstfereferencedata.support.OtherDataReferenceListFixture.validOtherDataReferenceListModel
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
@@ -31,7 +30,7 @@ class EMCSStubServiceSpec extends UnitSpec with MockEMCSStubConnector {
 
     "getOtherDataReferenceList method is called" when {
 
-       val service = new EMCSStubService(mockConnector)
+      val service = new EMCSStubService(mockConnector)
 
       "a successful response is returned from the EMCSStubConnector" when {
 

@@ -1,5 +1,7 @@
 # microservice specific routes
 
-GET        /other-reference-data-list   uk.gov.hmrc.emcstfereferencedata.controllers.EMCSStubController.getOtherDataReferenceList
+GET         /other-reference-data-list         uk.gov.hmrc.emcstfereferencedata.controllers.EMCSStubController.getOtherDataReferenceList
 
-GET        /oracle/transportMode        uk.gov.hmrc.emcstfereferencedata.controllers.OracleDBController.show
+GET         /oracle/transportMode              uk.gov.hmrc.emcstfereferencedata.controllers.OracleDBController.show
+
+POST        /oracle/cn-code-information        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveCnCodeInformationController.show

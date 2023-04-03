@@ -19,26 +19,27 @@ package uk.gov.hmrc.emcstfereferencedata.connector
 import akka.actor.ActorSystem
 import play.api.Logging
 import play.api.db.Database
-import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.models.response.{OtherDataReference, OtherDataReferenceList, OtherDataReferenceListResponseModel}
 
 import java.sql.ResultSet
 import javax.inject.Inject
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{ExecutionContext, Future, blocking}
 
-class OracleDBConnector @Inject()(db: Database, config: AppConfig, system: ActorSystem) extends RepositoryBase(db, config, system) with Logging {
+class OracleDBConnector @Inject()(db: Database, system: ActorSystem) extends Logging {
 
-  def readFromOracleDB(rs: ResultSet): List[OtherDataReference]= {
+  lazy implicit val ec: ExecutionContext = system.dispatchers.lookup("database.dispatcher")
+
+  private def readFromOracleDB(rs: ResultSet): List[OtherDataReference] = {
     val result = new Iterator[String] {
 
       def hasNext: Boolean = rs.next()
 
       def next(): String =
-        (1 to rs.getMetaData.getColumnCount).map(rs.getString).mkString("", ",","")
+        (1 to rs.getMetaData.getColumnCount).map(rs.getString).mkString("", ",", "")
     }
 
     result.map(_.split(",")).map(
-      row => OtherDataReference( "TransportMode", row(1), row(0))
+      row => OtherDataReference("TransportMode", row(1), row(0))
     ).toList
   }
 

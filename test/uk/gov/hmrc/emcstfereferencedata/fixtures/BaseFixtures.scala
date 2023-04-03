@@ -16,10 +16,20 @@
 
 package uk.gov.hmrc.emcstfereferencedata.fixtures
 
+import uk.gov.hmrc.emcstfereferencedata.models.response.CnCodeInformation
+
 trait BaseFixtures {
 
-  val ern = "SomeErn"
-  val testCredId = "cred1234567891"
-  val testInternalId = "int1234567891"
+  val testErn: String = "SomeErn"
+  val testCredId: String = "cred1234567891"
+  val testInternalId: String = "int1234567891"
+  val testCnCode: String = "24029000"
+  val testProductCode: String = "T400"
+  val testCnCodeList: Seq[String] = Seq(testCnCode)
+  val testProductCodeList: Seq[String] = Seq(testProductCode)
+  val testCnCodeInformation: CnCodeInformation = CnCodeInformation(
+    cnCodeDescription = "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+    unitOfMeasureCode = 1
+  )
 
 }

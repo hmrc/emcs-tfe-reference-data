@@ -16,19 +16,17 @@
 
 package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 
-import org.scalamock.handlers.CallHandler0
+import org.scalamock.handlers.CallHandler1
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfereferencedata.connector.OracleDBConnector
-import uk.gov.hmrc.emcstfereferencedata.models.response.OtherDataReferenceListResponseModel
+import uk.gov.hmrc.emcstfereferencedata.connector.RetrieveCnCodeInformationConnector
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 
-import scala.concurrent.Future
-
-trait MockOracleDBConnector extends MockFactory {
-  lazy val mockConnector: OracleDBConnector = mock[OracleDBConnector]
+trait MockRetrieveCnCodeInformationConnector extends MockFactory {
+  lazy val mockConnector: RetrieveCnCodeInformationConnector = mock[RetrieveCnCodeInformationConnector]
 
   object MockConnector {
-    def executeTransportModeOptionList(response: OtherDataReferenceListResponseModel): CallHandler0[Future[OtherDataReferenceListResponseModel]] = {
-      (() => mockConnector.executeTransportModeOptionList()).expects().returns(Future.successful(response))
-    }
+    def retrieveCnCodeInformation(productCode: String)(response: Either[ErrorResponse, Map[String, CnCodeInformation]]): CallHandler1[String, Either[ErrorResponse, Map[String, CnCodeInformation]]] =
+      (mockConnector.retrieveCnCodeInformation(_: String)).expects(productCode).returns(response)
   }
+
 }

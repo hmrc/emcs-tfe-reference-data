@@ -85,7 +85,7 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
         logger.debug(s"[checkOrganisationEMCSEnrolment] No ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found")
         Future.successful(Forbidden)
       case emcsEnrolments =>
-        if(emcsEnrolments.exists(_.isActivated)) block(UserRequest(request, internalId, credId)) else {
+        if (emcsEnrolments.exists(_.isActivated)) block(UserRequest(request, internalId, credId)) else {
           logger.debug(s"[checkOrganisationEMCSEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
           Future.successful(Forbidden)
         }

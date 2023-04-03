@@ -59,7 +59,7 @@ object OtherDataReferenceListFixture {
 			|""".stripMargin)
 
   val validOtherDataReferenceListModel = OtherDataReferenceList(
-    List(validOtherDataReferenceModel1,validOtherDataReferenceModel2)
+    List(validOtherDataReferenceModel1, validOtherDataReferenceModel2)
   )
 
   val clientErrorResponse = OtherDataReferenceListErrorModel(Status.BAD_REQUEST, "bang")

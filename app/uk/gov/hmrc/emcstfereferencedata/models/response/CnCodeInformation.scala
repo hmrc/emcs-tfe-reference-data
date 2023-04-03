@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.config
+package uk.gov.hmrc.emcstfereferencedata.models.response
 
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.{Inject, Singleton}
+case class CnCodeInformation(cnCodeDescription: String, unitOfMeasureCode: Int)
 
-@Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, config: Configuration) {
-
-  def stubUrl(): String = servicesConfig.baseUrl("emcs-tfe-reference-data-stub")
-
+object CnCodeInformation {
+  implicit val format: OFormat[CnCodeInformation] = Json.format[CnCodeInformation]
 }

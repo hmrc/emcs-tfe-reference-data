@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector
+package uk.gov.hmrc.emcstfereferencedata.models.request
 
-import akka.actor.ActorSystem
-import play.api.db.Database
-import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
+import play.api.libs.json.{Json, OFormat}
 
-import scala.concurrent.ExecutionContext
 
-abstract class RepositoryBase(db: Database, config: AppConfig, system: ActorSystem) {
+case class CnInformationRequest(productCodeList: Seq[String], cnCodeList: Seq[String])
 
-  lazy implicit val ec: ExecutionContext = system.dispatchers.lookup("database.dispatcher")
+object CnInformationRequest {
+  implicit val format: OFormat[CnInformationRequest] = Json.format[CnInformationRequest]
 }

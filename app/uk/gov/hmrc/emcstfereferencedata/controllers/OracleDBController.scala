@@ -26,14 +26,18 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton()
-class OracleDBController @Inject()(cc: ControllerComponents, connector: OracleDBConnector)
-                                  (implicit ec: ExecutionContext) extends BackendController(cc) {
+class OracleDBController @Inject()(cc: ControllerComponents,
+                                   connector: OracleDBConnector
+                                  )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   def show(): Action[AnyContent] = Action.async {
     connector.executeTransportModeOptionList().map {
-      case response:  OtherDataReferenceList => Ok(Json.toJson(response))
-      case error: OtherDataReferenceListErrorModel if error.status >= 400 && error.status < 500 => Status(error.status)(error.reason)
-      case _ => InternalServerError("Failed to retrieve other data reference list")
+      case response: OtherDataReferenceList =>
+        Ok(Json.toJson(response))
+      case error: OtherDataReferenceListErrorModel if error.status >= 400 && error.status < 500 =>
+        Status(error.status)(error.reason)
+      case _ =>
+        InternalServerError("Failed to retrieve other data reference list")
     }
   }
 

@@ -31,6 +31,7 @@ class EMCSStubControllerIntegrationSpec extends IntegrationBaseSpec {
     def setupStubs(): StubMapping
 
     def uri: String = "/other-reference-data-list"
+
     def DownstreamStubUri: String = s"/otherReferenceDataTransportMode"
 
     def request(): WSRequest = {

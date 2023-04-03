@@ -26,27 +26,27 @@ object AuthStub extends DownstreamStub with BaseFixtures {
 
   val authoriseUri = "/auth/authorise"
 
-  def authorised(exciseNumber: String = ern): StubMapping =
+  def authorised(exciseNumber: String = testErn): StubMapping =
     onSuccess(POST, authoriseUri, OK, Json.obj(
-        "affinityGroup" -> "Organisation",
-        "allEnrolments" -> Json.arr(
-          Json.obj(
-            "key" -> EnrolmentKeys.EMCS_ENROLMENT,
-            "identifiers" -> Json.arr(
-              Json.obj(
-                "key" -> EnrolmentKeys.ERN,
-                "value" -> exciseNumber,
-                "state" -> EnrolmentKeys.ACTIVATED
-              )
+      "affinityGroup" -> "Organisation",
+      "allEnrolments" -> Json.arr(
+        Json.obj(
+          "key" -> EnrolmentKeys.EMCS_ENROLMENT,
+          "identifiers" -> Json.arr(
+            Json.obj(
+              "key" -> EnrolmentKeys.ERN,
+              "value" -> exciseNumber,
+              "state" -> EnrolmentKeys.ACTIVATED
             )
           )
-        ),
-        "internalId" -> testInternalId,
-        "optionalCredentials" -> Json.obj(
-          "providerId" -> testCredId,
-          "providerType" -> "gg"
         )
-      ))
+      ),
+      "internalId" -> testInternalId,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> testCredId,
+        "providerType" -> "gg"
+      )
+    ))
 
   def unauthorised(): StubMapping =
     onError(POST, authoriseUri, UNAUTHORIZED)

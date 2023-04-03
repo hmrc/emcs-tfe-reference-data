@@ -25,7 +25,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockEMCSStubConnector extends MockFactory  {
+trait MockEMCSStubConnector extends MockFactory {
   lazy val mockConnector: EMCSStubConnector = mock[EMCSStubConnector]
 
   object MockConnector {
@@ -34,5 +34,5 @@ trait MockEMCSStubConnector extends MockFactory  {
       (mockConnector.getOtherDataReferenceList()(_: HeaderCarrier, _: ExecutionContext))
         .expects(*, *).returns(Future.successful(response))
     }
-}
+  }
 }
