@@ -25,8 +25,8 @@ trait MockRetrieveCnCodeInformationConnector extends MockFactory {
   lazy val mockConnector: RetrieveCnCodeInformationConnector = mock[RetrieveCnCodeInformationConnector]
 
   object MockConnector {
-    def retrieveCnCodeInformation(productCode: String)(response: Either[ErrorResponse, Map[String, CnCodeInformation]]): CallHandler1[String, Either[ErrorResponse, Map[String, CnCodeInformation]]] =
-      (mockConnector.retrieveCnCodeInformation(_: String)).expects(productCode).returns(response)
+    def retrieveCnCodeInformation(productCodes: Seq[String])(response: Either[ErrorResponse, Map[String, CnCodeInformation]]): CallHandler1[Seq[String], Either[ErrorResponse, Map[String, CnCodeInformation]]] =
+      (mockConnector.retrieveCnCodeInformation(_: Seq[String])).expects(productCodes).returns(response)
   }
 
 }

@@ -29,7 +29,7 @@ class RetrieveCnCodeInformationServiceSpec extends UnitSpec with MockRetrieveCnC
     "return a successful response containing the CnCodeInformation" when {
       "retrieveCnCodeInformation method is called" in {
         val testResponse = Right(Map(testCnCode -> testCnCodeInformation))
-        MockConnector.retrieveCnCodeInformation(testProductCode)(testResponse)
+        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(testResponse)
 
         TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList) shouldBe testResponse
       }
@@ -37,7 +37,7 @@ class RetrieveCnCodeInformationServiceSpec extends UnitSpec with MockRetrieveCnC
 
     "return an Error Response" when {
       "there is no data available" in {
-        MockConnector.retrieveCnCodeInformation(testProductCode)(Left(NoDataReturnedFromDatabaseError))
+        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(Left(NoDataReturnedFromDatabaseError))
 
         TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList) shouldBe Left(NoDataReturnedFromDatabaseError)
       }
