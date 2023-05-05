@@ -17,6 +17,8 @@
 package uk.gov.hmrc.emcstfereferencedata.connector
 
 
+import cats.instances.either._
+import cats.syntax.traverse._
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.RetrieveCnCodeInformationConnector._
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
@@ -28,35 +30,43 @@ import scala.annotation.tailrec
 
 @Singleton
 class RetrieveCnCodeInformationConnector @Inject()(db: Database) extends BaseConnector {
-  def retrieveCnCodeInformation(productCode: String): Either[ErrorResponse, Map[String, CnCodeInformation]] = {
+  def retrieveCnCodeInformation(productCodes: Seq[String]): Either[ErrorResponse, Map[String, CnCodeInformation]] = {
 
-    val storedProcedure = db.getConnection().prepareCall(storedProcedureQuery)
+    db.withConnection {
+      connection =>
+        productCodes.map {
+          productCode =>
+            val storedProcedure = connection.prepareCall(storedProcedureQuery)
 
-    storedProcedure.setString(categoryCodeParameterKey, productCode.head.toString)
-    storedProcedure.setString(productCodeParameterKey, productCode)
-    storedProcedure.registerOutParameter(cnCodeParameterKey, Types.REF_CURSOR)
-    storedProcedure.registerOutParameter(productCodeCountParameterKey, Types.NUMERIC)
-    storedProcedure.registerOutParameter(cnCodeCountParameterKey, Types.NUMERIC)
-    storedProcedure.execute()
+            storedProcedure.setString(categoryCodeParameterKey, productCode.head.toString)
+            storedProcedure.setString(productCodeParameterKey, productCode)
+            storedProcedure.registerOutParameter(cnCodeParameterKey, Types.REF_CURSOR)
+            storedProcedure.registerOutParameter(productCodeCountParameterKey, Types.NUMERIC)
+            storedProcedure.registerOutParameter(cnCodeCountParameterKey, Types.NUMERIC)
+            storedProcedure.execute()
 
-    val resultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
+            val resultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
 
-    @tailrec
-    def buildResult(map: Map[String, CnCodeInformation] = Map.empty): Map[String, CnCodeInformation] =
-      if (!resultSet.next()) {
-        map
-      } else {
-        val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
-        val cnCode = resultSet.getString(cnCodeKey)
-        val cdCodeDescription = resultSet.getString(cnCodeDescriptionKey)
-        buildResult(map + (cnCode -> CnCodeInformation(cdCodeDescription, unitOfMeasureCode)))
-      }
+            @tailrec
+            def buildResult(map: Map[String, CnCodeInformation] = Map.empty): Map[String, CnCodeInformation] =
+              if (!resultSet.next()) {
+                map
+              } else {
+                val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
+                val cnCode = resultSet.getString(cnCodeKey)
+                val cdCodeDescription = resultSet.getString(cnCodeDescriptionKey)
+                buildResult(map + (cnCode -> CnCodeInformation(cdCodeDescription, unitOfMeasureCode)))
+              }
 
-    val result = buildResult()
+            val result = buildResult()
 
-    storedProcedure.close()
+            storedProcedure.close()
 
-    if (result.isEmpty) Left(ErrorResponse.NoDataReturnedFromDatabaseError) else Right(result)
+            if (result.isEmpty) Left(ErrorResponse.NoDataReturnedFromDatabaseError) else Right(result)
+        }
+    }.sequence.map {
+      _.reduce(_ ++ _)
+    }
 
   }
 

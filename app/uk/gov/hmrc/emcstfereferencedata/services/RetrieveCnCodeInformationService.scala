@@ -28,16 +28,13 @@ import scala.collection.Map
 class RetrieveCnCodeInformationService @Inject()(retrieveCnCodeInformationConnector: RetrieveCnCodeInformationConnector) {
 
   def retrieveCnCodeInformation(productCodeList: Seq[String],
-                                cnCodeList: Seq[String]): Either[ErrorResponse, Map[String, CnCodeInformation]] =
-    productCodeList.map {
-      productCode =>
-        retrieveCnCodeInformationConnector.retrieveCnCodeInformation(productCode).map {
-          _.collect {
-            case (key, value) if cnCodeList.contains(key) => key -> value
-          }
+                                cnCodeList: Seq[String]): Either[ErrorResponse, Map[String, CnCodeInformation]] = {
+    retrieveCnCodeInformationConnector.retrieveCnCodeInformation(productCodeList)
+      .map {
+        _.collect {
+          case (key, value) if cnCodeList.contains(key) => key -> value
         }
-    }.sequence.map {
-      _.fold(Map[String, CnCodeInformation]())(_ ++ _)
-    }
+      }
+  }
 
 }
