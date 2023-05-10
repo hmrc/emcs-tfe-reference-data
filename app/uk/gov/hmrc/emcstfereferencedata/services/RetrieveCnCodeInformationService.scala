@@ -16,25 +16,27 @@
 
 package uk.gov.hmrc.emcstfereferencedata.services
 
-import cats.instances.either._
-import cats.syntax.traverse._
-import uk.gov.hmrc.emcstfereferencedata.connector.RetrieveCnCodeInformationConnector
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation.RetrieveCnCodeInformationConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.collection.Map
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RetrieveCnCodeInformationService @Inject()(retrieveCnCodeInformationConnector: RetrieveCnCodeInformationConnector) {
 
   def retrieveCnCodeInformation(productCodeList: Seq[String],
-                                cnCodeList: Seq[String]): Either[ErrorResponse, Map[String, CnCodeInformation]] = {
+                                cnCodeList: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, CnCodeInformation]]] = {
     retrieveCnCodeInformationConnector.retrieveCnCodeInformation(productCodeList)
-      .map {
-        _.collect {
-          case (key, value) if cnCodeList.contains(key) => key -> value
+      .map(
+        _.map {
+          _.collect {
+            case (key, value) if cnCodeList.contains(key) => key -> value
+          }
         }
-      }
+      )
   }
 
 }

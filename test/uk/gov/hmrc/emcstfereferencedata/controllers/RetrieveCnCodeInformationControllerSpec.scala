@@ -26,6 +26,8 @@ import uk.gov.hmrc.emcstfereferencedata.mocks.service.MockRetrieveCnCodeInformat
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
+import scala.concurrent.Future
+
 class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieveCnCodeInformationService with BaseFixtures {
 
   private val fakeRequest = FakeRequest(POST, "/oracle/cn-code-information").withJsonBody(
@@ -40,7 +42,7 @@ class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieve
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {
       "the service returns the other reference data" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Right(Map(testCnCode -> testCnCodeInformation)))
+        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Right(Map(testCnCode -> testCnCodeInformation))))
 
         val result = call(TestController.show, fakeRequest)
 
@@ -51,7 +53,7 @@ class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieve
 
     s"return a server error response" when {
       "the service returns a server error" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Left(NoDataReturnedFromDatabaseError))
+        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
         val result = call(TestController.show, fakeRequest)
 

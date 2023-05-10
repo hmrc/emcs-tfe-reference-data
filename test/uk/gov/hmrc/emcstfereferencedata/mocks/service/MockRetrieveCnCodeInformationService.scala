@@ -16,17 +16,20 @@
 
 package uk.gov.hmrc.emcstfereferencedata.mocks.service
 
-import org.scalamock.handlers.CallHandler2
+import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.emcstfereferencedata.services.RetrieveCnCodeInformationService
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MockRetrieveCnCodeInformationService extends MockFactory {
   lazy val mockService: RetrieveCnCodeInformationService = mock[RetrieveCnCodeInformationService]
 
   object MockService {
-    def retrieveCnCodeInformation(productCodeList: Seq[String], cnCodeList: Seq[String])(response: Either[ErrorResponse, Map[String, CnCodeInformation]]): CallHandler2[Seq[String], Seq[String], Either[ErrorResponse, collection.Map[String, CnCodeInformation]]] =
-      (mockService.retrieveCnCodeInformation(_: Seq[String], _: Seq[String])).expects(productCodeList, cnCodeList).returns(response)
+    def retrieveCnCodeInformation(productCodeList: Seq[String], cnCodeList: Seq[String])(response: Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]): CallHandler4[Seq[String], Seq[String], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, CnCodeInformation]]]] =
+      (mockService.retrieveCnCodeInformation(_: Seq[String], _: Seq[String])(_: HeaderCarrier, _: ExecutionContext)).expects(productCodeList, cnCodeList, *, *).returns(response)
   }
 
 }

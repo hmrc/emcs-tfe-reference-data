@@ -19,11 +19,11 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.services.RetrieveCnCodeInformationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton()
 class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
@@ -31,7 +31,7 @@ class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
                                                    ) extends BackendController(cc) {
 
 
-  def show: Action[CnInformationRequest] = Action(parse.json[CnInformationRequest] {
+  def show: Action[CnInformationRequest] = Action.async(parse.json[CnInformationRequest] {
     json =>
       for {
         productCodeList <- (json \ "productCodeList").validate[Seq[String]]
@@ -39,10 +39,10 @@ class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
       } yield CnInformationRequest(productCodeList, cnCodeList)
   }) {
     implicit request =>
-      retrieveCnCodeInformationService.retrieveCnCodeInformation(request.body.productCodeList, request.body.cnCodeList) match {
+      retrieveCnCodeInformationService.retrieveCnCodeInformation(request.body.productCodeList, request.body.cnCodeList).map {
         case Right(response) =>
           Ok(Json.toJson(response))
-        case Left(error@NoDataReturnedFromDatabaseError) =>
+        case Left(error) =>
           InternalServerError(Json.toJson(error))
       }
   }
