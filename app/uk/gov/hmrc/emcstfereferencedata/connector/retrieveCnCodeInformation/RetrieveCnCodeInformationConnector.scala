@@ -26,13 +26,13 @@ trait RetrieveCnCodeInformationConnector {
 }
 
 object RetrieveCnCodeInformationConnector {
-  private[connector] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getCNCodes(?, ?, ?, ?, ?)}"
-  private[connector] val categoryCodeParameterKey = "pCategory_code"
-  private[connector] val productCodeParameterKey = "pProduct_Code"
-  private[connector] val cnCodeParameterKey = "pCN_Codes"
-  private[connector] val productCodeCountParameterKey = "pProduct_count"
-  private[connector] val cnCodeCountParameterKey = "pCN_Codes_Count"
-  private[connector] val unitOfMeasureCodeKey = "UNIT_OF_MEASURE_CODE"
-  private[connector] val cnCodeKey = "CN_CODE"
-  private[connector] val cnCodeDescriptionKey = "CNCODEDESC"
+  private[retrieveCnCodeInformation] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getCNCodes(?, ?, ?, ?, ?)}"
+  private[retrieveCnCodeInformation] val categoryCodeParameterKey = "pCategory_code"
+  private[retrieveCnCodeInformation] val productCodeParameterKey = "pProduct_Code"
+  private[retrieveCnCodeInformation] val cnCodeParameterKey = "pCN_Codes"
+  private[retrieveCnCodeInformation] val productCodeCountParameterKey = "pProduct_count"
+  private[retrieveCnCodeInformation] val cnCodeCountParameterKey = "pCN_Codes_Count"
+  private[retrieveCnCodeInformation] val unitOfMeasureCodeKey = "UNIT_OF_MEASURE_CODE"
+  private[retrieveCnCodeInformation] val cnCodeKey = "CN_CODE"
+  private[retrieveCnCodeInformation] val cnCodeDescriptionKey = "CNCODEDESC"
 }

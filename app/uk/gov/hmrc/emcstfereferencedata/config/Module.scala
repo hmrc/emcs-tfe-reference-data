@@ -19,6 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.config
 import com.google.inject.{AbstractModule, Inject, Singleton}
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation.{RetrieveCnCodeInformationConnector, RetrieveCnCodeInformationConnectorOracle, RetrieveCnCodeInformationConnectorStub}
+import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes.{RetrievePackagingTypesConnector, RetrievePackagingTypesConnectorOracle, RetrievePackagingTypesConnectorStub}
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionImpl}
 
 @Singleton
@@ -31,8 +32,10 @@ class Module @Inject()(environment: Environment, config: Configuration) extends 
 
     if (config.get[Boolean]("feature-switch.use-oracle")) {
       bind(classOf[RetrieveCnCodeInformationConnector]).to(classOf[RetrieveCnCodeInformationConnectorOracle])
+      bind(classOf[RetrievePackagingTypesConnector]).to(classOf[RetrievePackagingTypesConnectorOracle])
     } else {
       bind(classOf[RetrieveCnCodeInformationConnector]).to(classOf[RetrieveCnCodeInformationConnectorStub])
+      bind(classOf[RetrievePackagingTypesConnector]).to(classOf[RetrievePackagingTypesConnectorStub])
     }
 
   }

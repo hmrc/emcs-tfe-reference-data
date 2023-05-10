@@ -14,29 +14,37 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation
+package uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes
 
 import play.api.http.Status.OK
+import play.api.libs.json.{JsError, JsObject, JsSuccess, Reads}
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
+import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
-                                                       val config: AppConfig
-                                                      ) extends RetrieveCnCodeInformationConnector with BaseConnector {
+class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClient,
+                                                    val config: AppConfig
+                                                      ) extends RetrievePackagingTypesConnector with BaseConnector {
 
-  type ConnectorOutcome = Map[String, CnCodeInformation]
+  type ConnectorOutcome = Map[String, String]
+
+  private val mapReads: Reads[Map[String, String]] = {
+    case JsObject(underlying) => JsSuccess(underlying.map {
+      case (k, v) => k -> v.as[String]
+    }.toMap)
+    case other => JsError(s"Cannot parse JSON as Map[String, String]: $other")
+  }
 
   implicit object ReferenceDataReads extends HttpReads[Either[ErrorResponse, ConnectorOutcome]] {
     override def read(method: String, url: String, response: HttpResponse): Either[ErrorResponse, ConnectorOutcome] = {
       response.status match {
         case OK =>
-          response.validateJson(CnCodeInformation.mapReads) match {
+          response.validateJson(mapReads) match {
             case Some(valid) => Right(valid)
             case None =>
               logger.warn(s"[read] Bad JSON response from emcs-tfe-reference-data-stub")
@@ -48,13 +56,13 @@ class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
       }
     }
   }
-  def retrieveCnCodeInformation(productCodes: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
-    lazy val url: String = s"${config.stubUrl()}/cn-code-information"
+  def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
+    lazy val url: String = s"${config.stubUrl()}/packaging-types"
 
     http.GET(url)(ReferenceDataReads, hc, ec)
       .recover {
         error =>
-          logger.warn(s"[retrieveCnCodeInformation] error retrieving reference data from stub: $error")
+          logger.warn(s"[retrievePackagingTypes] error retrieving packaging types from stub: $error")
           Left(UnexpectedDownstreamResponseError)
       }
   }

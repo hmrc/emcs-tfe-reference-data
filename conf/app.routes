@@ -5,3 +5,5 @@ GET         /other-reference-data-list         uk.gov.hmrc.emcstfereferencedata.
 GET         /oracle/transportMode              uk.gov.hmrc.emcstfereferencedata.controllers.OracleDBController.show
 
 POST        /oracle/cn-code-information        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveCnCodeInformationController.show
+
+POST        /oracle/packaging-types            uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show

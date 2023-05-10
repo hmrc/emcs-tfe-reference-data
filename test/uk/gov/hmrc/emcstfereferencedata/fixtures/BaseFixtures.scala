@@ -31,5 +31,15 @@ trait BaseFixtures {
     cnCodeDescription = "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
     unitOfMeasureCode = 1
   )
+  val testPackagingTypes: Seq[String] = Seq(
+    "VP",
+    "NE",
+    "TO"
+  )
+  val testPackagingTypesResult: Map[String, String] = Map(
+    "NE" -> "Unpacked or unpackaged",
+    "TO" -> "Tun",
+    "VP" -> "Vacuum-packed"
+  )
 
 }
