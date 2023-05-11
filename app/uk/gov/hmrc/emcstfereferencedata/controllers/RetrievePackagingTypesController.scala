@@ -22,12 +22,12 @@ import uk.gov.hmrc.emcstfereferencedata.services.RetrievePackagingTypesService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-@Singleton()
+@Singleton
 class RetrievePackagingTypesController @Inject()(cc: ControllerComponents,
                                                  retrievePackagingTypesService: RetrievePackagingTypesService
-                                                   ) extends BackendController(cc) {
+                                                )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
   def show: Action[Seq[String]] = Action.async(parse.json[Seq[String]] {

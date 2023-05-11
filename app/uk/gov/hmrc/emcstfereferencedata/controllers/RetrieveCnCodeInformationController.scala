@@ -23,12 +23,12 @@ import uk.gov.hmrc.emcstfereferencedata.services.RetrieveCnCodeInformationServic
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-@Singleton()
+@Singleton
 class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
                                                     retrieveCnCodeInformationService: RetrieveCnCodeInformationService
-                                                   ) extends BackendController(cc) {
+                                                   )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
   def show: Action[CnInformationRequest] = Action.async(parse.json[CnInformationRequest] {
