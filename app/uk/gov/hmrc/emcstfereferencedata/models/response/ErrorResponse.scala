@@ -33,4 +33,12 @@ object ErrorResponse {
     val message = "The database returned no data for the specified field/s"
   }
 
+  case object JsonValidationError extends ErrorResponse {
+    val message = "JSON validation error"
+  }
+
+  case object UnexpectedDownstreamResponseError extends ErrorResponse {
+    val message = "Unexpected downstream response status"
+  }
+
 }

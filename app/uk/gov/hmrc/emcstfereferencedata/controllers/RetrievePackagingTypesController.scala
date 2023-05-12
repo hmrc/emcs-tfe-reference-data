@@ -18,28 +18,26 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
-import uk.gov.hmrc.emcstfereferencedata.services.RetrieveCnCodeInformationService
+import uk.gov.hmrc.emcstfereferencedata.services.RetrievePackagingTypesService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
-                                                    retrieveCnCodeInformationService: RetrieveCnCodeInformationService
-                                                   )(implicit ec: ExecutionContext) extends BackendController(cc) {
+class RetrievePackagingTypesController @Inject()(cc: ControllerComponents,
+                                                 retrievePackagingTypesService: RetrievePackagingTypesService
+                                                )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
-  def show: Action[CnInformationRequest] = Action.async(parse.json[CnInformationRequest] {
+  def show: Action[Seq[String]] = Action.async(parse.json[Seq[String]] {
     json =>
       for {
-        productCodeList <- (json \ "productCodeList").validate[Seq[String]]
-        cnCodeList <- (json \ "cnCodeList").validate[Seq[String]]
-      } yield CnInformationRequest(productCodeList, cnCodeList)
+        packagingTypesList <- json.validate[Seq[String]]
+      } yield packagingTypesList
   }) {
     implicit request =>
-      retrieveCnCodeInformationService.retrieveCnCodeInformation(request.body.productCodeList, request.body.cnCodeList).map {
+      retrievePackagingTypesService.retrievePackagingTypes(request.body).map {
         case Right(response) =>
           Ok(Json.toJson(response))
         case Left(error) =>

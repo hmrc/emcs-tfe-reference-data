@@ -22,38 +22,33 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfereferencedata.mocks.service.MockRetrieveCnCodeInformationService
+import uk.gov.hmrc.emcstfereferencedata.mocks.service.MockRetrievePackagingTypesService
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieveCnCodeInformationService with BaseFixtures {
+class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePackagingTypesService with BaseFixtures {
 
-  private val fakeRequest = FakeRequest(POST, "/oracle/cn-code-information").withJsonBody(
-    Json.obj(
-      "productCodeList" -> Json.arr("T400"),
-      "cnCodeList" -> Json.arr("24029000")
-    ))
+  private val fakeRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testPackagingTypes))
 
-
-  object TestController extends RetrieveCnCodeInformationController(stubControllerComponents(), mockService)
+  object TestController extends RetrievePackagingTypesController(stubControllerComponents(), mockService)
 
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {
       "the service returns the other reference data" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Right(Map(testCnCode -> testCnCodeInformation))))
+        MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Right(testPackagingTypesResult)))
 
         val result = call(TestController.show, fakeRequest)
 
         status(result) shouldBe OK
-        contentAsJson(result) shouldBe Json.obj(testCnCode -> testCnCodeInformation)
+        contentAsJson(result) shouldBe Json.toJson(testPackagingTypesResult)
       }
     }
 
     s"return a server error response" when {
       "the service returns a server error" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+        MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
         val result = call(TestController.show, fakeRequest)
 

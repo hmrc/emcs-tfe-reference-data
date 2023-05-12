@@ -16,10 +16,17 @@
 
 package uk.gov.hmrc.emcstfereferencedata.models.response
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json._
 
 case class CnCodeInformation(cnCodeDescription: String, unitOfMeasureCode: Int)
 
 object CnCodeInformation {
   implicit val format: OFormat[CnCodeInformation] = Json.format[CnCodeInformation]
+
+  implicit val mapReads: Reads[Map[String, CnCodeInformation]] = {
+    case JsObject(underlying) => JsSuccess(underlying.map {
+      case (k, v) => k -> v.as[CnCodeInformation]
+    }.toMap)
+    case other => JsError(s"Cannot parse JSON as Map[String, CnCodeInformation]: $other")
+  }
 }

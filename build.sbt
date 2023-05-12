@@ -26,5 +26,6 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     ItTest / parallelExecution := false,
     addTestReportOption(ItTest, "int-test-reports")
   )
+  .settings(resolvers += Resolver.jcenterRepo)
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 8312)

@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.emcstfereferencedata.config
 
-import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfig @Inject()(servicesConfig: ServicesConfig, config: Configuration) {
+class AppConfig @Inject()(servicesConfig: ServicesConfig) {
 
   def stubUrl(): String = servicesConfig.baseUrl("emcs-tfe-reference-data-stub")
 

@@ -21,6 +21,8 @@ import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveCnCodeInfor
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
+import scala.concurrent.Future
+
 class RetrieveCnCodeInformationServiceSpec extends UnitSpec with MockRetrieveCnCodeInformationConnector with BaseFixtures {
 
   object TestService extends RetrieveCnCodeInformationService(mockConnector)
@@ -29,17 +31,17 @@ class RetrieveCnCodeInformationServiceSpec extends UnitSpec with MockRetrieveCnC
     "return a successful response containing the CnCodeInformation" when {
       "retrieveCnCodeInformation method is called" in {
         val testResponse = Right(Map(testCnCode -> testCnCodeInformation))
-        MockConnector.retrieveCnCodeInformation(testProductCode)(testResponse)
+        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(Future.successful(testResponse))
 
-        TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList) shouldBe testResponse
+        await(TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)) shouldBe testResponse
       }
     }
 
     "return an Error Response" when {
       "there is no data available" in {
-        MockConnector.retrieveCnCodeInformation(testProductCode)(Left(NoDataReturnedFromDatabaseError))
+        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
-        TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList) shouldBe Left(NoDataReturnedFromDatabaseError)
+        await(TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)) shouldBe Left(NoDataReturnedFromDatabaseError)
       }
     }
   }
