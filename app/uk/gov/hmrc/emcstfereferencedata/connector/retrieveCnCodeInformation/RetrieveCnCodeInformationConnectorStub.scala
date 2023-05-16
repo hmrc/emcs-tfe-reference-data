@@ -49,12 +49,15 @@ class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
     }
   }
   def retrieveCnCodeInformation(productCodes: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
+
+    logger.info(s"[RetrieveCnCodeInformationConnectorStub][retrieveCnCodeInformation] retrieving CN Code information for productCodes: $productCodes")
+
     lazy val url: String = s"${config.stubUrl()}/cn-code-information"
 
     http.GET(url)(ReferenceDataReads, hc, ec)
       .recover {
         error =>
-          logger.warn(s"[retrieveCnCodeInformation] error retrieving reference data from stub: $error")
+          logger.warn(s"[RetrieveCnCodeInformationConnectorStub][retrieveCnCodeInformation] error retrieving reference data from stub: $error")
           Left(UnexpectedDownstreamResponseError)
       }
   }
