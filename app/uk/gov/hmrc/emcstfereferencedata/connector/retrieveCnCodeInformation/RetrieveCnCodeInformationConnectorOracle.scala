@@ -34,6 +34,8 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
   def retrieveCnCodeInformation(productCodes: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, CnCodeInformation]]] =
     Future.successful {
 
+      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] retrieving CN Code information for productCodes: $productCodes")
+
       db.withConnection {
         connection =>
           productCodes.map {
@@ -64,7 +66,12 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
 
               storedProcedure.close()
 
-              if (result.isEmpty) Left(ErrorResponse.NoDataReturnedFromDatabaseError) else Right(result)
+              if (result.isEmpty) {
+                logger.warn(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found for productCodes: $productCodes")
+                Left(ErrorResponse.NoDataReturnedFromDatabaseError)
+              } else {
+                Right(result)
+              }
           }
       }.sequence.map {
         _.reduce(_ ++ _)
