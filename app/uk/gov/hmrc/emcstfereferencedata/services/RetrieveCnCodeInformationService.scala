@@ -25,11 +25,11 @@ import scala.collection.Map
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveCnCodeInformationService @Inject()(retrieveCnCodeInformationConnector: RetrieveCnCodeInformationConnector) {
+class RetrieveCnCodeInformationService @Inject()(connector: RetrieveCnCodeInformationConnector) {
 
   def retrieveCnCodeInformation(productCodeList: Seq[String],
                                 cnCodeList: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, CnCodeInformation]]] = {
-    retrieveCnCodeInformationConnector.retrieveCnCodeInformation(productCodeList)
+    connector.retrieveCnCodeInformation(productCodeList)
       .map(
         _.map {
           _.collect {

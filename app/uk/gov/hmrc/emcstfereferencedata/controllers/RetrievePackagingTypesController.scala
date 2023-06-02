@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class RetrievePackagingTypesController @Inject()(cc: ControllerComponents,
-                                                 retrievePackagingTypesService: RetrievePackagingTypesService
+                                                 service: RetrievePackagingTypesService
                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) {
 
 
@@ -37,7 +37,7 @@ class RetrievePackagingTypesController @Inject()(cc: ControllerComponents,
       } yield packagingTypesList
   }) {
     implicit request =>
-      retrievePackagingTypesService.retrievePackagingTypes(request.body).map {
+      service.retrievePackagingTypes(request.body).map {
         case Right(response) =>
           Ok(Json.toJson(response))
         case Left(error) =>

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfereferencedata.services
 
-import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes.RetrievePackagingTypesConnector
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveWineOperations.RetrieveWineOperationsConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.utils.Logging
@@ -27,20 +27,20 @@ import scala.collection.Map
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrievePackagingTypesService @Inject()(connector: RetrievePackagingTypesConnector) extends Logging {
+class RetrieveWineOperationsService @Inject()(connector: RetrieveWineOperationsConnector) extends Logging {
 
-  def retrievePackagingTypes(packagingTypesList: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] = {
-    connector.retrievePackagingTypes()
+  def retrieveWineOperations(wineOperationsList: Seq[String])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] = {
+    connector.retrieveWineOperations()
       .map(
         _.map {
           _.collect {
-            case (key, value) if packagingTypesList.contains(key) => key -> value
+            case (key, value) if wineOperationsList.contains(key) => key -> value
           }
         } match {
           case Left(value) => Left(value)
           case Right(value) if value.nonEmpty => Right(value)
           case _ =>
-            logger.warn(s"No data returned for input packaging types: $packagingTypesList")
+            logger.warn(s"No data returned for input wine operations: $wineOperationsList")
             Left(NoDataReturnedFromDatabaseError)
         }
       )
