@@ -41,5 +41,15 @@ trait BaseFixtures {
     "TO" -> "Tun",
     "VP" -> "Vacuum-packed"
   )
+  val testWineOperations: Seq[String] = Seq(
+    "4",
+    "11",
+    "9"
+  )
+  val testWineOperationsResult: Map[String, String] = Map(
+    "4" -> "The product has been sweetened",
+    "11" -> "The product has been partially dealcoholised",
+    "9" -> "The product has been made using oak chips"
+  )
 
 }

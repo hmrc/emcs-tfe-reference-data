@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.retrievePackagingTypes
+package uk.gov.hmrc.emcstfereferencedata.retrieveWineOperations
 
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
@@ -26,32 +26,32 @@ import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDataba
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends IntegrationBaseSpec with BaseFixtures with TestDatabase {
+class RetrieveWineOperationsControllerWithOracleIntegrationSpec extends IntegrationBaseSpec with BaseFixtures with TestDatabase {
 
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
   private trait Test {
 
-    private def uri: String = "/oracle/packaging-types"
+    private def uri: String = "/oracle/wine-operations"
 
     def request(): WSRequest = {
       buildRequest(uri)
     }
   }
 
-  "POST /oracle/cn-code-information (oracle)" when {
+  "POST /oracle/wine-operations (oracle)" when {
     "application.conf points the service to Oracle" should {
       populateCandeDb().toEither match {
         case Left(_) =>
           fail("Could not populate CANDE DB, see above logs for errors")
 
         case Right(_) =>
-          "return OK with JSON containing the packaging type descriptions" when {
-            "supplied with a list of packaging types" in new Test {
+          "return OK with JSON containing the wine operation descriptions" when {
+            "supplied with a list of wine operations" in new Test {
 
-              val testRequestJson: JsValue = Json.toJson(testPackagingTypes)
+              val testRequestJson: JsValue = Json.toJson(testWineOperations)
 
-              val testResponseJson: JsObject = Json.toJsObject(testPackagingTypesResult)
+              val testResponseJson: JsObject = Json.toJsObject(testWineOperationsResult)
 
 
               val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
