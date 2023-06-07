@@ -57,7 +57,8 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
             Json.obj(
               "24029000" -> Json.obj(
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
-                "unitOfMeasureCode" -> 1
+                "unitOfMeasureCode" -> 1,
+                "exciseProductCodeDescription" -> "Cigars &amp; cigarillos"
               )
             )
 
@@ -80,8 +81,7 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
               "cnCodeList" -> Json.arr("24029000")
             )
 
-          val testResponseJson: JsValue =
-            JsNull
+          val testResponseJson: JsValue = JsNull
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-code-information", OK, testResponseJson)
 
@@ -103,7 +103,8 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
             Json.obj(
               "24029000" -> Json.obj(
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
-                "unitOfMeasureCode" -> 1
+                "unitOfMeasureCode" -> 1,
+                "exciseProductCodeDescription" -> "Cigars &amp; cigarillos"
               )
             )
 

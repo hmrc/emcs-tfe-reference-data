@@ -58,6 +58,7 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
                 Json.obj(
                   "24029000" -> Json.obj(
                     "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+                    "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
                     "unitOfMeasureCode" -> 1
                   )
                 )
@@ -67,7 +68,7 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
 
               response.status shouldBe Status.OK
               response.header("Content-Type") shouldBe Some("application/json")
-              response.body should include(testResponseJson.toString())
+              response.json shouldBe testResponseJson
             }
           }
 
