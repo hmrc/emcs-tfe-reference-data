@@ -35,4 +35,5 @@ object RetrieveCnCodeInformationConnector {
   private[retrieveCnCodeInformation] val unitOfMeasureCodeKey = "UNIT_OF_MEASURE_CODE"
   private[retrieveCnCodeInformation] val cnCodeKey = "CN_CODE"
   private[retrieveCnCodeInformation] val cnCodeDescriptionKey = "CNCODEDESC"
+  private[retrieveCnCodeInformation] val exciseProductCodeDescriptionKey = "PRODDESC"
 }

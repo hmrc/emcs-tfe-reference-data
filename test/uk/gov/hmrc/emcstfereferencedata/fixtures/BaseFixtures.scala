@@ -29,6 +29,7 @@ trait BaseFixtures {
   val testProductCodeList: Seq[String] = Seq(testProductCode)
   val testCnCodeInformation: CnCodeInformation = CnCodeInformation(
     cnCodeDescription = "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+    exciseProductCodeDescription = "Fine-cut tobacco for the rolling of cigarettes",
     unitOfMeasureCode = 1
   )
   val testPackagingTypes: Seq[String] = Seq(
