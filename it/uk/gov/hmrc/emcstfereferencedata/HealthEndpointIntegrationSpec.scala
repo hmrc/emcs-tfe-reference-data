@@ -39,7 +39,7 @@ class HealthEndpointIntegrationSpec
       .configure("metrics.enabled" -> false)
       .build()
 
-  "service health endpoint" should {
+  "services health endpoint" should {
     "respond with 200 status" in {
       val response =
         wsClient

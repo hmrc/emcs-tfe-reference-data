@@ -39,7 +39,7 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
   }
 
   "POST /oracle/cn-code-information (oracle)" when {
-    "application.conf points the service to Oracle" should {
+    "application.conf points the services to Oracle" should {
       populateCandeDb().toEither match {
         case Left(_) =>
           fail("Could not populate CANDE DB, see above logs for errors")
