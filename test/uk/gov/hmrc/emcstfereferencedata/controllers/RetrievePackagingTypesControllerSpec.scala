@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfereferencedata.mocks.service.MockRetrievePackagingTypesService
+import uk.gov.hmrc.emcstfereferencedata.mocks.services.MockRetrievePackagingTypesService
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
@@ -36,7 +36,7 @@ class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePac
 
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {
-      "the service returns the other reference data" in {
+      "the services returns the other reference data" in {
         MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Right(testPackagingTypesResult)))
 
         val result = call(TestController.show, fakeRequest)
@@ -47,7 +47,7 @@ class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePac
     }
 
     s"return a server error response" when {
-      "the service returns a server error" in {
+      "the services returns a server error" in {
         MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
         val result = call(TestController.show, fakeRequest)

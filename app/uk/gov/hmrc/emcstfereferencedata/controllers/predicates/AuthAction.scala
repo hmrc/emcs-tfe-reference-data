@@ -34,6 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait AuthAction extends ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest]
 
+//TODO: implement this or remove it
+
 @Singleton
 class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
                                val parser: BodyParsers.Default

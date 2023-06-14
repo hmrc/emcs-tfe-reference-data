@@ -27,6 +27,7 @@ import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.xml.Elem
 
 class RetrievePackagingTypesControllerWithStubIntegrationSpec extends IntegrationBaseSpec with BaseFixtures {
 
@@ -43,7 +44,7 @@ class RetrievePackagingTypesControllerWithStubIntegrationSpec extends Integratio
 
   "POST /oracle/packaging-types (stub)" when {
 
-    "application.conf points the service to the stub" should {
+    "application.conf points the services to the stub" should {
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
@@ -67,10 +68,23 @@ class RetrievePackagingTypesControllerWithStubIntegrationSpec extends Integratio
 
           val testRequestJson: JsValue = Json.toJson(testPackagingTypes)
 
-          val testResponseJson: JsValue =
-            JsNull
+          val testResponseJson: JsValue = JsNull
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/packaging-types", OK, testResponseJson)
+
+          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(JsonValidationError)
+        }
+        s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
+
+          val testRequestJson: JsValue = Json.toJson(testPackagingTypes)
+
+          val testResponse: Elem = <Message>Success!</Message>
+
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/packaging-types", OK, testResponse)
 
           val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
 

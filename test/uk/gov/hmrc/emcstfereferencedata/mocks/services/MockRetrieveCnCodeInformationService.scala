@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.mocks.service
+package uk.gov.hmrc.emcstfereferencedata.mocks.services
 
 import org.scalamock.handlers.CallHandler4
 import org.scalamock.scalatest.MockFactory

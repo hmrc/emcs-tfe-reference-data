@@ -26,6 +26,7 @@ import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.xml.Elem
 
 class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends IntegrationBaseSpec {
 
@@ -42,7 +43,7 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
   "POST /oracle/cn-code-information (stub)" when {
 
-    "application.conf points the service to the stub" should {
+    "application.conf points the services to the stub" should {
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
@@ -84,6 +85,24 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           val testResponseJson: JsValue = JsNull
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-code-information", OK, testResponseJson)
+
+          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+          response.status shouldBe Status.INTERNAL_SERVER_ERROR
+          response.header("Content-Type") shouldBe Some("application/json")
+          response.json shouldBe Json.toJson(JsonValidationError)
+        }
+        s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
+
+          val testRequestJson: JsObject =
+            Json.obj(
+              "productCodeList" -> Json.arr("T400"),
+              "cnCodeList" -> Json.arr("24029000")
+            )
+
+          val testResponse: Elem = <Message>Success!</Message>
+
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-code-information", OK, testResponse)
 
           val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
 
