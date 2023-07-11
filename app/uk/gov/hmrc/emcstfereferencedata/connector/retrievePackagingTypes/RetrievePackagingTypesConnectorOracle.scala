@@ -38,7 +38,7 @@ class RetrievePackagingTypesConnectorOracle @Inject()(db: Database) extends Retr
           storedProcedure.setString(typeNameParameterKey, typeNameParameterValue)
           storedProcedure.setInt(sortByParameterKey, 1)
           storedProcedure.setString(sortOrderParameterKey, null)
-          storedProcedure.setInt(startAtParameterKey, 1)
+          storedProcedure.setInt(startAtParameterKey, 0)
           storedProcedure.setInt(maxRecordsParameterKey, 1000)
           storedProcedure.setString(descriptionParameterKey, null)
           storedProcedure.registerOutParameter(totalCountKey, Types.NUMERIC)
