@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfereferencedata.fixtures
 
-import uk.gov.hmrc.emcstfereferencedata.models.response.CnCodeInformation
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, TraderKnownFacts}
 
 trait BaseFixtures {
 
@@ -51,6 +51,15 @@ trait BaseFixtures {
     "4" -> "The product has been sweetened",
     "11" -> "The product has been partially dealcoholised",
     "9" -> "The product has been made using oak chips"
+  )
+  val testTraderKnownFactsResult: TraderKnownFacts = TraderKnownFacts(
+    traderName = Some("SEED TRADER 1629"),
+    addressLine1 = Some("629 High Street"),
+    addressLine2 = Some("Any Suburb"),
+    addressLine3 = Some("Any Town"),
+    addressLine4 = Some("Any County"),
+    addressLine5 = Some("UK"),
+    postcode = Some("SS1 99AA")
   )
 
 }

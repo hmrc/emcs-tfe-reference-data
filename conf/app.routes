@@ -3,3 +3,5 @@ POST        /oracle/cn-code-information        uk.gov.hmrc.emcstfereferencedata.
 POST        /oracle/packaging-types            uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show
 
 POST        /oracle/wine-operations            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show
+
+GET        /oracle/trader-known-facts            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)

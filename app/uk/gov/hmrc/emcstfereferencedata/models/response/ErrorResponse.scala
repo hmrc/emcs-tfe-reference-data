@@ -30,7 +30,7 @@ object ErrorResponse {
     writes.contramap[T](c => c: ErrorResponse)
 
   case object NoDataReturnedFromDatabaseError extends ErrorResponse {
-    val message = "The database returned no data for the specified field/s"
+    val message = "The database returned no data for the specified field(s)"
   }
 
   case object JsonValidationError extends ErrorResponse {
