@@ -15,10 +15,10 @@ lazy val microservice = Project("emcs-tfe-reference-data", file("."))
     scalacOptions += "-Wconf:src=routes/.*:s",
   )
   .configs(ItTest)
-  .settings(inConfig(ItTest)(Defaults.itSettings): _*)
+  .settings(inConfig(ItTest)(Defaults.itSettings) *)
   .settings(
-    Test / fork := false,
-    ItTest / fork := false,
+    Test / fork := true,
+    ItTest / fork := true,
     ItTest / unmanagedSourceDirectories := Seq((ItTest / baseDirectory).value / "it"),
     ItTest / unmanagedClasspath += baseDirectory.value / "resources",
     Runtime / unmanagedClasspath += baseDirectory.value / "resources",
