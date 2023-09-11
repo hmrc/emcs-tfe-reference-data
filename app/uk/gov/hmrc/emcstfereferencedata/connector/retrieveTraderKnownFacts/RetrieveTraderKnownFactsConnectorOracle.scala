@@ -46,9 +46,10 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
           @tailrec
           def buildResult(result: Option[TraderKnownFacts] = None): Option[TraderKnownFacts] =
             if (!resultSet.next()) {
+              logger.debug(s"Known facts retrieved for $exciseRegistrationId: [$result]")
               result
             } else {
-              buildResult(Some(TraderKnownFacts(
+              val res = Some(TraderKnownFacts(
                 traderName = getOptionalValue(resultSet, traderNameKey),
                 addressLine1 = getOptionalValue(resultSet, address1Key),
                 addressLine2 = getOptionalValue(resultSet, address2Key),
@@ -56,7 +57,9 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
                 addressLine4 = getOptionalValue(resultSet, address4Key),
                 addressLine5 = getOptionalValue(resultSet, address5Key),
                 postcode = getOptionalValue(resultSet, postcodeKey)
-              )))
+              ))
+              logger.info(s"Retrieved known facts: $res")
+              buildResult(res)
             }
 
           val result = buildResult()
@@ -78,7 +81,9 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
     // Wrapping in Option turns null into None and something into Some(something)
     Option(result)
   } catch {
-    case _: Throwable => None
+    case _: Throwable =>
+      logger.warn(s"Unable to retrieve $key as String from ResultSet")
+      None
   }
 
 }
