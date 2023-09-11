@@ -18,15 +18,7 @@ package uk.gov.hmrc.emcstfereferencedata.models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-case class TraderKnownFacts(traderName: Option[String], addressLine1: Option[String], addressLine2: Option[String], addressLine3: Option[String], addressLine4: Option[String], addressLine5: Option[String], postcode: Option[String]) {
-  def nonEmpty: Boolean = traderName.nonEmpty ||
-    addressLine1.nonEmpty ||
-    addressLine2.nonEmpty ||
-    addressLine3.nonEmpty ||
-    addressLine4.nonEmpty ||
-    addressLine5.nonEmpty ||
-    postcode.nonEmpty
-}
+case class TraderKnownFacts(traderName: String, addressLine1: Option[String], addressLine2: Option[String], addressLine3: Option[String], addressLine4: Option[String], addressLine5: Option[String], postcode: Option[String])
 
 object TraderKnownFacts {
   implicit val fmt: OFormat[TraderKnownFacts] = Json.format

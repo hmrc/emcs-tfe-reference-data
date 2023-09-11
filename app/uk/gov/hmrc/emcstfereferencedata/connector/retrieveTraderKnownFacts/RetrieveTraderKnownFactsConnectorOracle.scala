@@ -49,7 +49,7 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
               result
             } else {
               buildResult(Some(TraderKnownFacts(
-                traderName = getOptionalValue(exciseRegistrationId, resultSet, traderNameKey),
+                traderName = resultSet.getString(traderNameKey),
                 addressLine1 = getOptionalValue(exciseRegistrationId, resultSet, address1Key),
                 addressLine2 = getOptionalValue(exciseRegistrationId, resultSet, address2Key),
                 addressLine3 = getOptionalValue(exciseRegistrationId, resultSet, address3Key),
@@ -78,8 +78,8 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
     // Wrapping in Option turns null into None and something into Some(something)
     Option(result)
   } catch {
-    case _: Throwable =>
-      logger.warn(s"[RetrieveTraderKnownFactsConnectorOracle][getOptionalValue] Unable to retrieve $key as String from ResultSet for exciseRegistrationId: $exciseRegistrationId")
+    case error: Throwable =>
+      logger.warn(s"[RetrieveTraderKnownFactsConnectorOracle][getOptionalValue] Error retrieving $key as String from ResultSet for exciseRegistrationId: $exciseRegistrationId", error)
       None
   }
 
