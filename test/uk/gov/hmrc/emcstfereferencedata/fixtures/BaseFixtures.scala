@@ -53,7 +53,7 @@ trait BaseFixtures {
     "9" -> "The product has been made using oak chips"
   )
   val testTraderKnownFactsResult: TraderKnownFacts = TraderKnownFacts(
-    traderName = Some("SEED TRADER 1629"),
+    traderName = "SEED TRADER 1629",
     addressLine1 = Some("629 High Street"),
     addressLine2 = Some("Any Suburb"),
     addressLine3 = Some("Any Town"),

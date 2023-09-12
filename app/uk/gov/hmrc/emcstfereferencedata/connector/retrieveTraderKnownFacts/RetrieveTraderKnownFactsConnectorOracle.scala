@@ -49,13 +49,13 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
               result
             } else {
               buildResult(Some(TraderKnownFacts(
-                traderName = getOptionalValue(resultSet, traderNameKey),
-                addressLine1 = getOptionalValue(resultSet, address1Key),
-                addressLine2 = getOptionalValue(resultSet, address2Key),
-                addressLine3 = getOptionalValue(resultSet, address3Key),
-                addressLine4 = getOptionalValue(resultSet, address4Key),
-                addressLine5 = getOptionalValue(resultSet, address5Key),
-                postcode = getOptionalValue(resultSet, postcodeKey)
+                traderName = resultSet.getString(traderNameKey),
+                addressLine1 = getOptionalValue(exciseRegistrationId, resultSet, address1Key),
+                addressLine2 = getOptionalValue(exciseRegistrationId, resultSet, address2Key),
+                addressLine3 = getOptionalValue(exciseRegistrationId, resultSet, address3Key),
+                addressLine4 = getOptionalValue(exciseRegistrationId, resultSet, address4Key),
+                addressLine5 = getOptionalValue(exciseRegistrationId, resultSet, address5Key),
+                postcode = getOptionalValue(exciseRegistrationId, resultSet, postcodeKey)
               )))
             }
 
@@ -71,14 +71,16 @@ class RetrieveTraderKnownFactsConnectorOracle @Inject()(db: Database) extends Re
       }
     }
 
-  private def getOptionalValue(resultSet: ResultSet, key: String): Option[String] = try {
+  private def getOptionalValue(exciseRegistrationId: String, resultSet: ResultSet, key: String): Option[String] = try {
     val result = resultSet.getString(key)
 
     // getString can return null if value isn't present
     // Wrapping in Option turns null into None and something into Some(something)
     Option(result)
   } catch {
-    case _: Throwable => None
+    case error: Throwable =>
+      logger.warn(s"[RetrieveTraderKnownFactsConnectorOracle][getOptionalValue] Error retrieving $key as String from ResultSet for exciseRegistrationId: $exciseRegistrationId", error)
+      None
   }
 
 }

@@ -35,7 +35,7 @@ class RetrieveTraderKnownFactsController @Inject()(cc: ControllerComponents,
       service.retrieveTraderKnownFacts(exciseRegistrationId).map {
         case Right(response) =>
           response match {
-            case Some(value) if value.nonEmpty => Ok(Json.toJson(value))
+            case Some(value) => Ok(Json.toJson(value))
             case _ => NoContent
           }
         case Left(error) =>
