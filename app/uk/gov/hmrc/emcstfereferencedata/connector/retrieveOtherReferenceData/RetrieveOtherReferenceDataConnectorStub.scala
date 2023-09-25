@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector.retrieveWineOperations
+package uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData
 
 import play.api.http.Status.OK
 import play.api.libs.json.{JsError, JsObject, JsSuccess, Reads}
@@ -27,9 +27,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveWineOperationsConnectorStub @Inject()(val http: HttpClient,
-                                                    val config: AppConfig
-                                                      ) extends RetrieveWineOperationsConnector with BaseConnector {
+class RetrieveOtherReferenceDataConnectorStub @Inject()(val http: HttpClient,
+                                                        val config: AppConfig
+                                                      ) extends RetrieveOtherReferenceDataConnector with BaseConnector {
 
   type ConnectorOutcome = Map[String, String]
 
@@ -56,13 +56,13 @@ class RetrieveWineOperationsConnectorStub @Inject()(val http: HttpClient,
       }
     }
   }
-  def retrieveWineOperations()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
-    lazy val url: String = s"${config.stubUrl()}/wine-operations"
+  override def retrieveOtherReferenceData(typeName: TypeName)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
+    lazy val url: String = s"${config.stubUrl()}" + typeName.stubUrl
 
     http.GET(url)(ReferenceDataReads, hc, ec)
       .recover {
         error =>
-          logger.warn(s"[retrieveWineOperations] error retrieving packaging types from stub: $error")
+          logger.warn(s"[retrieveWineOperations] error retrieving $typeName from stub: $error")
           Left(UnexpectedDownstreamResponseError)
       }
   }

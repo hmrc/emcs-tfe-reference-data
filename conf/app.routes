@@ -4,4 +4,6 @@ POST        /oracle/packaging-types            uk.gov.hmrc.emcstfereferencedata.
 
 POST        /oracle/wine-operations            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show
 
-GET        /oracle/trader-known-facts            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)
+GET         /oracle/member-states              uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveMemberStatesController.memberStates
+
+GET         /oracle/trader-known-facts         uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)

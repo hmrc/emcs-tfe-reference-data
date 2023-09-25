@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.retrieveWineOperations
+package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
 
 import play.api.http.Status
-import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
+import uk.gov.hmrc.emcstfereferencedata.models.response.Country
 import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
@@ -29,65 +30,44 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.xml.Elem
 
-class RetrieveWineOperationsControllerWithStubIntegrationSpec extends IntegrationBaseSpec with BaseFixtures {
+class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationBaseSpec with BaseFixtures {
 
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
 
-    private def uri: String = "/oracle/wine-operations"
+    private def uri: String = "/oracle/member-states"
 
     def request(): WSRequest = {
       buildRequest(uri)
     }
   }
 
-  "POST /oracle/wine-operations (stub)" when {
+  "GET /oracle/member-states (stub)" when {
 
     "application.conf points the services to the stub" should {
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
 
-          val testRequestJson: JsValue = Json.toJson(testWineOperations)
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", OK, Json.toJsObject(memberStatesResult))
 
-          val testResponseJson: JsObject = Json.toJsObject(testWineOperationsResult)
-
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/wine-operations", OK, testResponseJson)
-
-          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
 
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe testResponseJson
+          response.json shouldBe Json.toJson(Country(memberStatesResult))
         }
       }
 
       s"return a fail" when {
         s"the stub returns status code OK ($OK) and a body which cannot be mapped to JSON" in new Test {
 
-          val testRequestJson: JsValue = Json.toJson(testWineOperations)
+          val testResponseJson: JsValue = JsNull
 
-          val testResponseJson: JsValue =
-            JsNull
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", OK, testResponseJson)
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/wine-operations", OK, testResponseJson)
-
-          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
-
-          response.status shouldBe Status.INTERNAL_SERVER_ERROR
-          response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(JsonValidationError)
-        }
-        s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
-
-          val testRequestJson: JsValue = Json.toJson(testWineOperations)
-
-          val testResponse: Elem = <Message>Success!</Message>
-
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/wine-operations", OK, testResponse)
-
-          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
 
           response.status shouldBe Status.INTERNAL_SERVER_ERROR
           response.header("Content-Type") shouldBe Some("application/json")
@@ -95,13 +75,9 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
 
-          val testRequestJson: JsValue = Json.toJson(testWineOperations)
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", INTERNAL_SERVER_ERROR, Json.toJsObject(memberStatesResult))
 
-          val testResponseJson: JsObject = Json.toJsObject(testWineOperationsResult)
-
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/wine-operations", BAD_REQUEST, testResponseJson)
-
-          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
 
           response.status shouldBe Status.INTERNAL_SERVER_ERROR
           response.header("Content-Type") shouldBe Some("application/json")

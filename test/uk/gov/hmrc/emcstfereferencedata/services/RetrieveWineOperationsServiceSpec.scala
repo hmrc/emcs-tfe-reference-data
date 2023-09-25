@@ -17,13 +17,13 @@
 package uk.gov.hmrc.emcstfereferencedata.services
 
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveWineOperationsConnector
+import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveOtherReferenceDataConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrieveWineOperationsServiceSpec extends UnitSpec with MockRetrieveWineOperationsConnector with BaseFixtures {
+class RetrieveWineOperationsServiceSpec extends UnitSpec with MockRetrieveOtherReferenceDataConnector with BaseFixtures {
 
   object TestService extends RetrieveWineOperationsService(mockConnector)
 
