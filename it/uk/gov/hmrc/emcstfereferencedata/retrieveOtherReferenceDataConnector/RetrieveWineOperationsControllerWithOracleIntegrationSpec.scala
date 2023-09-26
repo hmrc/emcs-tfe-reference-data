@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.retrieveWineOperations
+package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
 
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}

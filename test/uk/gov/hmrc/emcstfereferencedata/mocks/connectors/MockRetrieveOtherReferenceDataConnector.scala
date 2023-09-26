@@ -18,18 +18,21 @@ package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 
 import org.scalamock.handlers.CallHandler2
 import org.scalamock.scalatest.MockFactory
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveWineOperations.RetrieveWineOperationsConnector
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData.RetrieveOtherReferenceDataConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockRetrieveWineOperationsConnector extends MockFactory {
-  lazy val mockConnector: RetrieveWineOperationsConnector = mock[RetrieveWineOperationsConnector]
+trait MockRetrieveOtherReferenceDataConnector extends MockFactory {
+  lazy val mockConnector: RetrieveOtherReferenceDataConnector = mock[RetrieveOtherReferenceDataConnector]
 
   object MockConnector {
     def retrieveWineOperations()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
       (mockConnector.retrieveWineOperations()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
+
+    def retrieveMemberStates()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
+      (mockConnector.retrieveMemberStates()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
   }
 
 }

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector.retrieveWineOperations
+package uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData
 
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveWineOperations.RetrieveWineOperationsConnector._
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData.RetrieveOtherReferenceDataConnector._
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -27,15 +27,16 @@ import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveWineOperationsConnectorOracle @Inject()(db: Database) extends RetrieveWineOperationsConnector with BaseConnector {
-  def retrieveWineOperations()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
+class RetrieveOtherReferenceDataConnectorOracle @Inject()(db: Database) extends RetrieveOtherReferenceDataConnector with BaseConnector {
+
+  def retrieveOtherReferenceData(typeName: TypeName)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
     Future.successful {
 
       db.withConnection {
         connection =>
           val storedProcedure: CallableStatement = connection.prepareCall(storedProcedureQuery)
 
-          storedProcedure.setString(typeNameParameterKey, typeNameParameterValue)
+          storedProcedure.setString(typeNameParameterKey, typeName.oracleParameter)
           storedProcedure.setInt(sortByParameterKey, 1)
           storedProcedure.setString(sortOrderParameterKey, null)
           storedProcedure.setInt(startAtParameterKey, 0)

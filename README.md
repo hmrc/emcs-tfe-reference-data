@@ -141,3 +141,41 @@ Retrieve wine operation information for a list of wine operations
 **Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfereferencedata/models/response/ErrorResponse.scala)
 
 </details>
+
+<details>
+<summary>Retrieve member states
+
+**`GET`** /oracle/member-states</summary>
+
+Retrieve member states list
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: Array of [Country](app/uk/gov/hmrc/emcstfereferencedata/models/response/Country.scala) object
+
+**Example response body**:
+
+```json
+[
+  {
+    "countryCode": "FR",
+    "country": "France"
+  },
+  {
+    "countryCode": "AT",
+    "country": "Austria"
+  }
+]
+```
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfereferencedata/models/response/ErrorResponse.scala)
+
+</details>
