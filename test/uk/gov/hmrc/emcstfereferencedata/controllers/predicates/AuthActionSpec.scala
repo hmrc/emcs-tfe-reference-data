@@ -46,7 +46,7 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
     val authConnector: AuthConnector
     lazy val authAction = new AuthActionImpl(authConnector, bodyParsers)
 
-    def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
+    def onPageLoad(): Action[AnyContent] = authAction(Some(testErn)) { _ => Results.Ok }
 
     lazy val result = onPageLoad()(fakeRequest)
   }
@@ -55,125 +55,181 @@ class AuthActionSpec extends UnitSpec with BaseFixtures {
                    enrolments: Enrolments = Enrolments(Set.empty),
                    internalId: Option[String] = Some(testInternalId),
                    credId: Option[Credentials] = Some(Credentials(testCredId, "gg"))): AuthRetrieval =
-    new~(new~(new~(affinityGroup, enrolments), internalId), credId)
+    new ~(new ~(new ~(affinityGroup, enrolments), internalId), credId)
 
   "AuthAction" when {
 
-    "User is not logged in" must {
+    "calling .invokeBlock" when {
 
-      "redirect to the sign-in URL with the ContinueURL set" in new Harness {
+      "User is not logged in" must {
 
-        override val authConnector = new FakeFailingAuthConnector(new BearerTokenExpired)
+        "redirect to the sign-in URL with the ContinueURL set" in new Harness {
 
-        status(result) shouldBe UNAUTHORIZED
-      }
-    }
-
-    "An unexpected Authorisation exception is returned from the Auth library" must {
-
-      "redirect to unauthorised" in new Harness {
-
-        override val authConnector = new FakeFailingAuthConnector(new InsufficientConfidenceLevel)
-
-        status(result) shouldBe FORBIDDEN
-      }
-    }
-
-    "User is logged in" when {
-
-      "Affinity Group of user does not exist" must {
-
-        "redirect to unauthorised" in new Harness {
-
-          override val authConnector = new FakeSuccessAuthConnector(authResponse(affinityGroup = None))
+          override val authConnector = new FakeFailingAuthConnector(new BearerTokenExpired)
 
           status(result) shouldBe UNAUTHORIZED
         }
       }
 
-      "Affinity Group of user is not Organisation" must {
+      "An unexpected Authorisation exception is returned from the Auth library" must {
 
         "redirect to unauthorised" in new Harness {
 
-          override val authConnector = new FakeSuccessAuthConnector(authResponse(affinityGroup = Some(Agent)))
+          override val authConnector = new FakeFailingAuthConnector(new InsufficientConfidenceLevel)
 
-          status(result) shouldBe UNAUTHORIZED
+          status(result) shouldBe FORBIDDEN
         }
       }
 
-      "Affinity Group of user is Organisation" when {
+      "User is logged in" when {
 
-        "internalId is not retrieved from Auth" must {
+        "Affinity Group of user does not exist" must {
 
           "redirect to unauthorised" in new Harness {
 
-            override val authConnector = new FakeSuccessAuthConnector(authResponse(internalId = None))
+            override val authConnector = new FakeSuccessAuthConnector(authResponse(affinityGroup = None))
 
             status(result) shouldBe UNAUTHORIZED
           }
         }
 
-        "internalId is retrieved from Auth" when {
+        "Affinity Group of user is not Organisation" must {
 
-          "credential is not retrieved from Auth" must {
+          "redirect to unauthorised" in new Harness {
+
+            override val authConnector = new FakeSuccessAuthConnector(authResponse(affinityGroup = Some(Agent)))
+
+            status(result) shouldBe UNAUTHORIZED
+          }
+        }
+
+        "Affinity Group of user is Organisation" when {
+
+          "internalId is not retrieved from Auth" must {
 
             "redirect to unauthorised" in new Harness {
 
-              override val authConnector = new FakeSuccessAuthConnector(authResponse(credId = None))
+              override val authConnector = new FakeSuccessAuthConnector(authResponse(internalId = None))
 
               status(result) shouldBe UNAUTHORIZED
             }
           }
 
-          "credential is retrieved from Auth" when {
+          "internalId is retrieved from Auth" when {
 
-            s"Enrolments is missing the ${EnrolmentKeys.EMCS_ENROLMENT}" must {
-
-              "redirect to unauthorised" in new Harness {
-
-                override val authConnector = new FakeSuccessAuthConnector(authResponse())
-
-                status(result) shouldBe FORBIDDEN
-              }
-            }
-
-            s"Enrolments exists for ${EnrolmentKeys.EMCS_ENROLMENT} but is NOT activated" must {
+            "credential is not retrieved from Auth" must {
 
               "redirect to unauthorised" in new Harness {
 
-                override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
-                  Enrolment(
-                    key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
-                    state = EnrolmentKeys.INACTIVE
-                  )
-                ))))
+                override val authConnector = new FakeSuccessAuthConnector(authResponse(credId = None))
 
-                status(result) shouldBe FORBIDDEN
+                status(result) shouldBe UNAUTHORIZED
               }
             }
 
-            s"At least one Enrolment exists for ${EnrolmentKeys.EMCS_ENROLMENT} that is activated" must {
+            "credential is retrieved from Auth" when {
 
-              "allow the User through, returning a 200 (OK)" in new Harness {
+              s"Enrolments is missing the ${EnrolmentKeys.EMCS_ENROLMENT}" must {
 
-                override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
-                  Enrolment(
-                    key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
-                    state = EnrolmentKeys.ACTIVATED
-                  ), Enrolment(
-                    key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
-                    state = EnrolmentKeys.ACTIVATED
-                  ), Enrolment(
-                    key = EnrolmentKeys.EMCS_ENROLMENT,
-                    identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
-                    state = EnrolmentKeys.ACTIVATED
-                  )
-                ))))
+                "redirect to unauthorised" in new Harness {
 
-                status(result) shouldBe OK
+                  override val authConnector = new FakeSuccessAuthConnector(authResponse())
+
+                  status(result) shouldBe FORBIDDEN
+                }
+              }
+
+              s"Enrolments exists for ${EnrolmentKeys.EMCS_ENROLMENT} but is NOT activated" must {
+
+                "redirect to unauthorised" in new Harness {
+
+                  override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                    Enrolment(
+                      key = EnrolmentKeys.EMCS_ENROLMENT,
+                      identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
+                      state = EnrolmentKeys.INACTIVE
+                    )
+                  ))))
+
+                  status(result) shouldBe FORBIDDEN
+                }
+              }
+
+              s"Enrolments exists for ${EnrolmentKeys.EMCS_ENROLMENT} AND is activated" when {
+
+                s"the ${EnrolmentKeys.ERN} identifier is missing (should be impossible)" must {
+
+                  "redirect to unauthorised" in new Harness {
+
+                    override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(),
+                        state = EnrolmentKeys.ACTIVATED
+                      )
+                    ))))
+
+                    status(result) shouldBe FORBIDDEN
+                  }
+                }
+
+                s"the ${EnrolmentKeys.ERN} identifier is present and matches ERN from URL" must {
+
+                  "allow the User through, returning a 200 (OK)" in new Harness {
+
+                    override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
+                        state = EnrolmentKeys.ACTIVATED
+                      )
+                    ))))
+
+                    status(result) shouldBe OK
+                  }
+                }
+
+                s"the ${EnrolmentKeys.ERN} identifier is present and DOES NOT match ERN from URL" must {
+
+                  "return Forbidden" in new Harness {
+
+                    override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, "other")),
+                        state = EnrolmentKeys.ACTIVATED
+                      )
+                    ))))
+
+                    status(result) shouldBe FORBIDDEN
+                  }
+                }
+
+                s"there are multiple Enrolments with ${EnrolmentKeys.ERN}'s present and ERN matches one" must {
+
+                  "allow the User through, returning a 200 (OK)" in new Harness {
+
+                    override val authConnector = new FakeSuccessAuthConnector(authResponse(enrolments = Enrolments(Set(
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, "OTHER_1")),
+                        state = EnrolmentKeys.INACTIVE
+                      ),
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, testErn)),
+                        state = EnrolmentKeys.ACTIVATED
+                      ),
+                      Enrolment(
+                        key = EnrolmentKeys.EMCS_ENROLMENT,
+                        identifiers = Seq(EnrolmentIdentifier(EnrolmentKeys.ERN, "OTHER_2")),
+                        state = EnrolmentKeys.ACTIVATED
+                      )
+                    ))))
+
+                    status(result) shouldBe OK
+                  }
+                }
               }
             }
           }

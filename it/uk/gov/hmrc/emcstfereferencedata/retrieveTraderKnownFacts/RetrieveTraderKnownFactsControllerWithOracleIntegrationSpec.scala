@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveTraderKnownFacts
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
+import uk.gov.hmrc.emcstfereferencedata.stubs.AuthStub
 import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDatabase}
 
 import scala.concurrent.Await
@@ -30,6 +32,7 @@ class RetrieveTraderKnownFactsControllerWithOracleIntegrationSpec extends Integr
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/trader-known-facts"
 
@@ -38,6 +41,7 @@ class RetrieveTraderKnownFactsControllerWithOracleIntegrationSpec extends Integr
     private def queryParams: Seq[(String, String)] = Seq("exciseRegistrationId" -> id)
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
         .withQueryStringParameters(queryParams: _*)
     }
@@ -50,8 +54,11 @@ class RetrieveTraderKnownFactsControllerWithOracleIntegrationSpec extends Integr
           fail("Could not populate CANDE DB, see above logs for errors")
 
         case Right(_) =>
-          "return OK with JSON containing the wine operation descriptions" when {
-            "supplied with a list of wine operations" in new Test {
+          "return OK with JSON containing the trader known facts" when {
+            "supplied with an ERN which belongs to the logged in user" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised(id)
+              }
 
               val testResponseJson: JsObject = Json.toJsObject(testTraderKnownFactsResult)
 
@@ -64,8 +71,32 @@ class RetrieveTraderKnownFactsControllerWithOracleIntegrationSpec extends Integr
             }
           }
 
+          "return Forbidden" when {
+            "user is unauthorised" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.unauthorised()
+              }
+
+              val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
+            "user is authorised with the wrong ERN" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised("WrongERN")
+              }
+
+              val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
+          }
+
           "return NoContent" when {
             "there is no data in the database" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised(id)
+              }
 
               override def id: String = "BEANS"
 

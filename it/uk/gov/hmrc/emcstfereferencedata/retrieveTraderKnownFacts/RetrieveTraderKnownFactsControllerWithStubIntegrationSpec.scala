@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveTraderKnownFacts
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfereferencedata.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
@@ -34,6 +35,7 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/trader-known-facts"
 
@@ -42,6 +44,7 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
     private def queryParams: Seq[(String, String)] = Seq("exciseRegistrationId" -> id)
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
         .withQueryStringParameters(queryParams: _*)
     }
@@ -53,6 +56,9 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised(id)
+          }
           val testResponseJson: JsObject = Json.toJsObject(testTraderKnownFactsResult)
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/trader-known-facts", OK, testResponseJson)
@@ -66,7 +72,28 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
       }
 
       s"return a fail" when {
+        "user is unauthorised" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.unauthorised()
+          }
+
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+          response.status shouldBe Status.FORBIDDEN
+        }
+        "user is authorised with the wrong ERN" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised("WrongERN")
+          }
+
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+          response.status shouldBe Status.FORBIDDEN
+        }
         s"the stub returns status code OK ($OK) and a body which cannot be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised(id)
+          }
 
           val testResponseJson: JsValue =
             JsNull
@@ -80,6 +107,9 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised(id)
+          }
 
           val testResponse: Elem = <Message>Success!</Message>
 
@@ -92,6 +122,9 @@ class RetrieveTraderKnownFactsControllerWithStubIntegrationSpec extends Integrat
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised(id)
+          }
 
           val testResponseJson: JsObject = Json.toJsObject(testTraderKnownFactsResult)
 

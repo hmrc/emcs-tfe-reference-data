@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.FakeAuthAction
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.mocks.services.MockRetrieveCnCodeInformationService
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
@@ -28,7 +29,7 @@ import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieveCnCodeInformationService with BaseFixtures {
+class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieveCnCodeInformationService with BaseFixtures with FakeAuthAction {
 
   private val fakeRequest = FakeRequest(POST, "/oracle/cn-code-information").withJsonBody(
     Json.obj(
@@ -37,7 +38,7 @@ class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieve
     ))
 
 
-  object TestController extends RetrieveCnCodeInformationController(stubControllerComponents(), mockService)
+  object TestController extends RetrieveCnCodeInformationController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {

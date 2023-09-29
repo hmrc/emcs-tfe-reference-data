@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
+package uk.gov.hmrc.emcstfereferencedata.retrieveMemberStates
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.{JsNull, JsValue, Json}
@@ -23,7 +24,7 @@ import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.Country
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfereferencedata.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
@@ -34,10 +35,12 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/member-states"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -48,6 +51,9 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", OK, Json.toJsObject(memberStatesResult))
 
@@ -60,7 +66,19 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
       }
 
       s"return a fail" when {
+        "user is unauthorised" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.unauthorised()
+          }
+
+          val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+          response.status shouldBe Status.FORBIDDEN
+        }
         s"the stub returns status code OK ($OK) and a body which cannot be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testResponseJson: JsValue = JsNull
 
@@ -73,6 +91,9 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", INTERNAL_SERVER_ERROR, Json.toJsObject(memberStatesResult))
 

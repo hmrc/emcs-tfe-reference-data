@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.FakeAuthAction
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.mocks.services.MockRetrieveWineOperationsService
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
@@ -28,11 +29,11 @@ import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWineOperationsService with BaseFixtures {
+class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWineOperationsService with BaseFixtures with FakeAuthAction {
 
   private val fakeRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testWineOperations))
 
-  object TestController extends RetrieveWineOperationsController(stubControllerComponents(), mockService)
+  object TestController extends RetrieveWineOperationsController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {

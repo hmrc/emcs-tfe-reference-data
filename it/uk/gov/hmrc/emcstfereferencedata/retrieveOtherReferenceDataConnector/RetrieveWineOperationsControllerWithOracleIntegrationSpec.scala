@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
+import uk.gov.hmrc.emcstfereferencedata.stubs.AuthStub
 import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDatabase}
 
 import scala.concurrent.Await
@@ -31,10 +33,12 @@ class RetrieveWineOperationsControllerWithOracleIntegrationSpec extends Integrat
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/wine-operations"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -48,6 +52,9 @@ class RetrieveWineOperationsControllerWithOracleIntegrationSpec extends Integrat
         case Right(_) =>
           "return OK with JSON containing the wine operation descriptions" when {
             "supplied with a list of wine operations" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
 
               val testRequestJson: JsValue = Json.toJson(testWineOperations)
 
@@ -62,8 +69,25 @@ class RetrieveWineOperationsControllerWithOracleIntegrationSpec extends Integrat
             }
           }
 
+          "return Forbidden" when {
+            "user is unauthorised" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.unauthorised()
+              }
+
+              val testRequestJson: JsValue = Json.toJson(testWineOperations)
+
+              val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
+          }
+
           "return Internal Server Error" when {
             "there is no data in the database" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
 
               val testRequestJson: JsArray = Json.arr("BEANS")
 

@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveCnCodeInformation
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
+import uk.gov.hmrc.emcstfereferencedata.stubs.AuthStub
 import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDatabase}
 
 import scala.concurrent.Await
@@ -30,10 +32,12 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/cn-code-information"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -47,6 +51,9 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
         case Right(_) =>
           "return OK with JSON containing the Unit of Measure and CN Code Description" when {
             "supplied with a list of CN Codes and a list of Product Codes" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
 
               val testRequestJson: JsObject =
                 Json.obj(
@@ -72,8 +79,29 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
             }
           }
 
+          "return Forbidden" when {
+            "user is unauthorised" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.unauthorised()
+              }
+
+              val testRequestJson: JsObject =
+                Json.obj(
+                  "productCodeList" -> Json.arr("T400"),
+                  "cnCodeList" -> Json.arr("24029000")
+                )
+
+              val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
+          }
+
           "return Internal Server Error" when {
             "there is no data in the database" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
 
               val testRequestJson: JsObject =
                 Json.obj(
