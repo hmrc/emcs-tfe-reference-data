@@ -23,7 +23,7 @@ case class TransportUnit(code: String, description: String)
 object TransportUnit {
   implicit val format: Format[TransportUnit] = Json.format[TransportUnit]
 
-  def apply(countries: Map[String, String]): Seq[TransportUnit] = countries.map {
+  def apply(transportUnits: Map[String, String]): Seq[TransportUnit] = transportUnits.map {
     case (code, description) => TransportUnit(code, description)
   }.toSeq.sortBy(_.description)
 }
