@@ -18,20 +18,19 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfereferencedata.services.RetrieveMemberStatesService
+import uk.gov.hmrc.emcstfereferencedata.services.RetrieveTransportUnitsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RetrieveMemberStatesController @Inject()(cc: ControllerComponents,
-                                               service: RetrieveMemberStatesService
-                                              )(implicit ec: ExecutionContext) extends BackendController(cc) {
-
-
-  def memberStates: Action[AnyContent] = Action.async { implicit request =>
-    service.retrieveMemberStates().map {
+class RetrieveTransportUnitsController @Inject()(
+                                                  cc: ControllerComponents,
+                                                  service: RetrieveTransportUnitsService
+                                                )(implicit ec: ExecutionContext) extends BackendController(cc) {
+  def show: Action[AnyContent] = Action.async { implicit request =>
+    service.retrieveTransportUnits().map {
       case Right(response) =>
         Ok(Json.toJson(response))
       case Left(error) =>

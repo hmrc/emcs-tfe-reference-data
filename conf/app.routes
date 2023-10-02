@@ -6,4 +6,6 @@ POST        /oracle/wine-operations            uk.gov.hmrc.emcstfereferencedata.
 
 GET         /oracle/member-states              uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveMemberStatesController.memberStates
 
+GET         /oracle/transport-units            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTransportUnitsController.show
+
 GET         /oracle/trader-known-facts         uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)
