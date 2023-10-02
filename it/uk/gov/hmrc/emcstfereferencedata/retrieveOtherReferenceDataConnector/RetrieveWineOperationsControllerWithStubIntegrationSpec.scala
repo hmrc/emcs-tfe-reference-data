@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfereferencedata.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
@@ -34,10 +35,12 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/wine-operations"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -48,6 +51,9 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsValue = Json.toJson(testWineOperations)
 
@@ -64,7 +70,21 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
       }
 
       s"return a fail" when {
+        "user is unauthorised" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.unauthorised()
+          }
+
+          val testRequestJson: JsValue = Json.toJson(testWineOperations)
+
+          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+          response.status shouldBe Status.FORBIDDEN
+        }
         s"the stub returns status code OK ($OK) and a body which cannot be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsValue = Json.toJson(testWineOperations)
 
@@ -80,6 +100,9 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsValue = Json.toJson(testWineOperations)
 
@@ -94,6 +117,9 @@ class RetrieveWineOperationsControllerWithStubIntegrationSpec extends Integratio
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsValue = Json.toJson(testWineOperations)
 

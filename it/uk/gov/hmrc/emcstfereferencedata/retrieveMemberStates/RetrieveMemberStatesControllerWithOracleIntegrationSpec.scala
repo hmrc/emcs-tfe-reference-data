@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.retrieveOtherReferenceDataConnector
+package uk.gov.hmrc.emcstfereferencedata.retrieveMemberStates
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.Country
+import uk.gov.hmrc.emcstfereferencedata.stubs.AuthStub
 import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDatabase}
 
 import scala.concurrent.Await
@@ -31,10 +33,12 @@ class RetrieveMemberStatesControllerWithOracleIntegrationSpec extends Integratio
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/member-states"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -47,12 +51,27 @@ class RetrieveMemberStatesControllerWithOracleIntegrationSpec extends Integratio
 
         case Right(_) =>
           "return OK with JSON containing the member states descriptions" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+            }
 
             val response: WSResponse = Await.result(request().get(), 1.minutes)
 
             response.status shouldBe Status.OK
             response.header("Content-Type") shouldBe Some("application/json")
             response.json shouldBe Json.toJson(Country(memberStatesResult))
+          }
+
+          "return Forbidden" when {
+            "user is unauthorised" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.unauthorised()
+              }
+
+              val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
           }
       }
     }

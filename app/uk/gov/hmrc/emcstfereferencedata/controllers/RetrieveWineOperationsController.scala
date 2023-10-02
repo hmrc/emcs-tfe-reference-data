@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
+import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfereferencedata.services.RetrieveWineOperationsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -26,16 +27,17 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class RetrieveWineOperationsController @Inject()(cc: ControllerComponents,
-                                                 service: RetrieveWineOperationsService
-                                                )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                 service: RetrieveWineOperationsService,
+                                                 override val auth: AuthAction
+                                                )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
 
-  def show: Action[Seq[String]] = Action.async(parse.json[Seq[String]] {
+  def show: Action[Seq[String]] = authorisedUserPostRequest {
     json =>
       for {
         wineOperationsList <- json.validate[Seq[String]]
       } yield wineOperationsList
-  }) {
+  } {
     implicit request =>
       service.retrieveWineOperations(request.body).map {
         case Right(response) =>

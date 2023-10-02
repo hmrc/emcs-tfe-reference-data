@@ -32,52 +32,61 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
-trait AuthAction extends ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest]
-
-//TODO: implement this or remove it
+trait AuthAction {
+  def apply(ern: Option[String]): ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest]
+}
 
 @Singleton
 class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
-                               val parser: BodyParsers.Default
-                              )(implicit val executionContext: ExecutionContext) extends AuthAction with AuthorisedFunctions with Logging {
+                               val bodyParser: BodyParsers.Default
+                              )(implicit val ec: ExecutionContext) extends AuthAction with AuthorisedFunctions with Logging {
 
-  override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
+  override def apply(ern: Option[String]): ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest] =
+    new ActionBuilder[UserRequest, AnyContent] with ActionFunction[Request, UserRequest] {
+      override val parser = bodyParser
+      override val executionContext = ec
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+      override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
 
-    implicit val req = request
+        implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
-    authorised().retrieve(Retrievals.affinityGroup and Retrievals.allEnrolments and Retrievals.internalId and Retrievals.credentials) {
+        implicit val req = request
 
-      case Some(Organisation) ~ enrolments ~ Some(internalId) ~ Some(credentials) =>
-        checkOrganisationEMCSEnrolment(enrolments, internalId, credentials.providerId)(block)
+        authorised().retrieve(Retrievals.affinityGroup and Retrievals.allEnrolments and Retrievals.internalId and Retrievals.credentials) {
 
-      case Some(Organisation) ~ _ ~ None ~ _ =>
-        logger.warn("[invokeBlock] InternalId could not be retrieved from Auth")
-        Future.successful(Unauthorized)
+          case Some(Organisation) ~ enrolments ~ Some(internalId) ~ Some(credentials) =>
+            logger.debug("[invokeBlock] Checking for EMCS Enrolment")
+            checkOrganisationEMCSEnrolment(ern, enrolments, internalId, credentials.providerId)(block)
 
-      case Some(Organisation) ~ _ ~ _ ~ None =>
-        logger.warn("[invokeBlock] Credentials could not be retrieved from Auth")
-        Future.successful(Unauthorized)
+          case Some(Organisation) ~ _ ~ None ~ _ =>
+            logger.warn("[invokeBlock] InternalId could not be retrieved from Auth")
+            Future.successful(Unauthorized)
 
-      case Some(affinityGroup) ~ _ ~ _ ~ _ =>
-        logger.warn(s"[invokeBlock] User has incompatible AffinityGroup of '$affinityGroup'")
-        Future.successful(Unauthorized)
+          case Some(Organisation) ~ _ ~ _ ~ None =>
+            logger.warn("[invokeBlock] Credentials could not be retrieved from Auth")
+            Future.successful(Unauthorized)
 
-      case _ =>
-        logger.warn(s"[invokeBlock] User has no AffinityGroup")
-        Future.successful(Unauthorized)
+          case Some(affinityGroup) ~ _ ~ _ ~ _ =>
+            logger.warn(s"[invokeBlock] User has incompatible AffinityGroup of '$affinityGroup'")
+            Future.successful(Unauthorized)
 
-    } recover {
-      case _: NoActiveSession =>
-        Unauthorized
-      case x: AuthorisationException =>
-        logger.debug(s"[invokeBlock] Authorisation Exception ${x.reason}")
-        Forbidden
+          case _ =>
+            logger.warn(s"[invokeBlock] User has no AffinityGroup")
+            Future.successful(Unauthorized)
+
+        } recover {
+          case x: NoActiveSession =>
+            logger.debug(s"[invokeBlock] NoActiveSession Exception with reason: ${x.reason}")
+            Unauthorized
+          case x: AuthorisationException =>
+            logger.debug(s"[invokeBlock] Authorisation Exception ${x.reason}")
+            Forbidden
+        }
+      }
     }
-  }
 
-  private def checkOrganisationEMCSEnrolment[A](enrolments: Enrolments,
+  private def checkOrganisationEMCSEnrolment[A](ernFromUrl: Option[String],
+                                                enrolments: Enrolments,
                                                 internalId: String,
                                                 credId: String
                                                )(block: UserRequest[A] => Future[Result])
@@ -87,7 +96,23 @@ class AuthActionImpl @Inject()(override val authConnector: AuthConnector,
         logger.debug(s"[checkOrganisationEMCSEnrolment] No ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found")
         Future.successful(Forbidden)
       case emcsEnrolments =>
-        if (emcsEnrolments.exists(_.isActivated)) block(UserRequest(request, internalId, credId)) else {
+        if (emcsEnrolments.exists(_.isActivated)) {
+          ernFromUrl match {
+            case None =>
+              // Accessing route which doesn't contain an ERN
+              block(UserRequest(request, internalId, credId))
+            case Some(ern) =>
+              // Accessing route which contains an ERN, e.g. GET /oracle/trader-known-facts
+              emcsEnrolments.find(_.identifiers.exists(ident => ident.key == EnrolmentKeys.ERN && ident.value == ern)) match {
+                case Some(_) =>
+                  block(UserRequest(request, internalId, credId))
+                case None =>
+                  logger.warn(s"[checkOrganisationEMCSEnrolment] User attempted to access ern: '$ernFromUrl' which they are not authorised to view")
+                  Future.successful(Forbidden)
+              }
+          }
+
+        } else {
           logger.debug(s"[checkOrganisationEMCSEnrolment] ${EnrolmentKeys.EMCS_ENROLMENT} enrolment found but not activated")
           Future.successful(Forbidden)
         }

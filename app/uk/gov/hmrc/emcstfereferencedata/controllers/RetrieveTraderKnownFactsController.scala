@@ -18,6 +18,7 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfereferencedata.services.RetrieveTraderKnownFactsService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -26,11 +27,12 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class RetrieveTraderKnownFactsController @Inject()(cc: ControllerComponents,
-                                                   service: RetrieveTraderKnownFactsService
-                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) {
+                                                   service: RetrieveTraderKnownFactsService,
+                                                   override val auth: AuthAction
+                                                  )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
 
-  def show(exciseRegistrationId: String): Action[AnyContent] = Action.async {
+  def show(exciseRegistrationId: String): Action[AnyContent] = authorisedUserGetRequestWithErn(exciseRegistrationId) {
     implicit request =>
       service.retrieveTraderKnownFacts(exciseRegistrationId).map {
         case Right(response) =>

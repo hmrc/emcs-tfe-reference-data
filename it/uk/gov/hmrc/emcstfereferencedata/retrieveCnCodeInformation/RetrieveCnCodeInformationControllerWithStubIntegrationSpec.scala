@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.emcstfereferencedata.retrieveCnCodeInformation
 
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
+import uk.gov.hmrc.emcstfereferencedata.stubs.{AuthStub, DownstreamStub}
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
@@ -33,10 +34,12 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
+    def setupStubs(): StubMapping
 
     private def uri: String = "/oracle/cn-code-information"
 
     def request(): WSRequest = {
+      setupStubs()
       buildRequest(uri)
     }
   }
@@ -47,6 +50,9 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsObject =
             Json.obj(
@@ -74,7 +80,26 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
       }
 
       s"return a fail" when {
+        "user is unauthorised" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.unauthorised()
+          }
+
+          val testRequestJson: JsObject =
+            Json.obj(
+              "productCodeList" -> Json.arr("T400"),
+              "cnCodeList" -> Json.arr("24029000")
+            )
+
+          val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+          response.status shouldBe Status.FORBIDDEN
+        }
+
         s"the stub returns status code OK ($OK) and a body which cannot be mapped to JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsObject =
             Json.obj(
@@ -93,6 +118,9 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code OK ($OK) and a body which is not JSON" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsObject =
             Json.obj(
@@ -111,6 +139,9 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           response.json shouldBe Json.toJson(JsonValidationError)
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
+          override def setupStubs(): StubMapping = {
+            AuthStub.authorised()
+          }
 
           val testRequestJson: JsObject =
             Json.obj(
