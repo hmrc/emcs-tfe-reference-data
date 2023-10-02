@@ -92,4 +92,12 @@ trait BaseFixtures {
     "GB" -> "United Kingdom"
   )
 
+  val transportUnitsResult: Map[String, String] = Map(
+    "1" -> "Container",
+    "2" -> "Vehicle",
+    "3" -> "Trailer",
+    "4" -> "Tractor",
+    "5" -> "Fixed transport installations"
+  )
+
 }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfereferencedata.services
 
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData.RetrieveOtherReferenceDataConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
-import uk.gov.hmrc.emcstfereferencedata.models.response.{Country, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, TransportUnit}
 import uk.gov.hmrc.emcstfereferencedata.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -26,15 +26,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RetrieveMemberStatesService @Inject()(connector: RetrieveOtherReferenceDataConnector) extends Logging {
+class RetrieveTransportUnitsService @Inject()(connector: RetrieveOtherReferenceDataConnector) extends Logging {
 
-  def retrieveMemberStates()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Seq[Country]]] =
-    connector.retrieveMemberStates()
+  def retrieveTransportUnits()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Seq[TransportUnit]]] =
+    connector.retrieveTransportUnits()
       .map {
         case Left(value) => Left(value)
-        case Right(countries) if countries.nonEmpty => Right(Country(countries))
+        case Right(transportUnits) if transportUnits.nonEmpty => Right(TransportUnit(transportUnits))
         case _ =>
-          logger.warn(s"No data returned for member states")
+          logger.warn(s"No data returned for transport units")
           Left(NoDataReturnedFromDatabaseError)
       }
 

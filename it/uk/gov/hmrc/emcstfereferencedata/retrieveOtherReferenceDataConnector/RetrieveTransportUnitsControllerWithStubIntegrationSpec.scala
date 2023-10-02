@@ -21,41 +21,41 @@ import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.{JsNull, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfereferencedata.models.response.Country
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
+import uk.gov.hmrc.emcstfereferencedata.models.response.TransportUnit
 import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfereferencedata.support.IntegrationBaseSpec
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationBaseSpec with BaseFixtures {
+class RetrieveTransportUnitsControllerWithStubIntegrationSpec extends IntegrationBaseSpec with BaseFixtures {
 
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> false)
 
   private trait Test {
 
-    private def uri: String = "/oracle/member-states"
+    private def uri: String = "/oracle/transport-units"
 
     def request(): WSRequest = {
       buildRequest(uri)
     }
   }
 
-  "GET /oracle/member-states (stub)" when {
+  "GET /oracle/transport-units (stub)" when {
 
     "application.conf points the services to the stub" should {
 
       s"return a success" when {
         s"the stub returns status code OK ($OK) and a body which can be mapped to JSON" in new Test {
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", OK, Json.toJsObject(memberStatesResult))
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/transport-units", OK, Json.toJsObject(transportUnitsResult))
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 
           response.status shouldBe Status.OK
           response.header("Content-Type") shouldBe Some("application/json")
-          response.json shouldBe Json.toJson(Country(memberStatesResult))
+          response.json shouldBe Json.toJson(TransportUnit(transportUnitsResult))
         }
       }
 
@@ -64,7 +64,7 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
 
           val testResponseJson: JsValue = JsNull
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", OK, testResponseJson)
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/transport-units", OK, testResponseJson)
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 
@@ -74,7 +74,7 @@ class RetrieveMemberStatesControllerWithStubIntegrationSpec extends IntegrationB
         }
         s"the stub returns status code other than OK ($OK)" in new Test {
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/member-states", INTERNAL_SERVER_ERROR, Json.toJsObject(memberStatesResult))
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/transport-units", INTERNAL_SERVER_ERROR, Json.toJsObject(memberStatesResult))
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 

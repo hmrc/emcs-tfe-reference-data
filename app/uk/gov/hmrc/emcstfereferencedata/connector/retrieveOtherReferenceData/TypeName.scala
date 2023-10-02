@@ -30,3 +30,8 @@ object MemberStates extends TypeName {
   override val oracleParameter: String = "MemberState"
   override val stubUrl: String = "/member-states"
 }
+
+object TransportUnits extends TypeName {
+  override val oracleParameter: String = "TransportUnit"
+  override val stubUrl: String = "/transport-units"
+}
