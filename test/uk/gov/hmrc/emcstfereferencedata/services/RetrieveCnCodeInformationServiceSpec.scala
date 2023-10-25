@@ -17,31 +17,38 @@
 package uk.gov.hmrc.emcstfereferencedata.services
 
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
-import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveCnCodeInformationConnector
+import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.{MockRetrieveCnCodeInformationConnector, MockRetrieveProductCodesConnector}
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrieveCnCodeInformationServiceSpec extends UnitSpec with MockRetrieveCnCodeInformationConnector with BaseFixtures {
+class RetrieveCnCodeInformationServiceSpec
+  extends UnitSpec
+    with MockRetrieveCnCodeInformationConnector
+    with MockRetrieveProductCodesConnector
+    with BaseFixtures {
 
-  object TestService extends RetrieveCnCodeInformationService(mockConnector)
+  object TestService extends RetrieveCnCodeInformationService(mockCnCodeInformationConnector, mockProductCodesConnector)
 
   "The RetrieveCnCodeInformationService" should {
     "return a successful response containing the CnCodeInformation" when {
       "retrieveCnCodeInformation method is called" in {
-        val testResponse = Right(Map(testCnCode -> testCnCodeInformation))
-        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(Future.successful(testResponse))
+        val testResponse1 = Right(Map(testCnCode1 -> testCnCodeInformation1))
+        val testResponse2 = Right(Map(testCnCode2 -> testCnCodeInformation2))
+        MockCnCodeInformationConnector.retrieveCnCodeInformation(testCnCodeInformationRequest.copy(items = Seq(testCnCodeInformationItem1)))(Future.successful(testResponse1))
+        MockProductCodesConnector.retrieveProductCodes(testCnCodeInformationRequest.copy(items = Seq(testCnCodeInformationItem2)))(Future.successful(testResponse2))
 
-        await(TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)) shouldBe testResponse
+        await(TestService.retrieveCnCodeInformation(testCnCodeInformationRequest)) shouldBe Right(Map(testCnCode1 -> testCnCodeInformation1, testCnCode2 -> testCnCodeInformation2))
       }
     }
 
     "return an Error Response" when {
       "there is no data available" in {
-        MockConnector.retrieveCnCodeInformation(Seq(testProductCode))(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+        MockCnCodeInformationConnector.retrieveCnCodeInformation(testCnCodeInformationRequest.copy(items = Seq(testCnCodeInformationItem1)))(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+        MockProductCodesConnector.retrieveProductCodes(testCnCodeInformationRequest.copy(items = Seq(testCnCodeInformationItem2)))(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
-        await(TestService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)) shouldBe Left(NoDataReturnedFromDatabaseError)
+        await(TestService.retrieveCnCodeInformation(testCnCodeInformationRequest)) shouldBe Left(NoDataReturnedFromDatabaseError)
       }
     }
   }

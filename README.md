@@ -19,8 +19,16 @@ Retrieve CN Code information for a given list of Product Codes and CN Codes
 
 ```json
 {
-  "productCodeList": ["T400"],
-  "cnCodeList": ["24029000"]
+  "items": [
+    {
+      "productCode": "B000",
+      "cnCode": "22030001"
+    },
+    {
+      "productCode": "S500",
+      "cnCode": "10000000"
+    }
+  ]
 }
 ```
 

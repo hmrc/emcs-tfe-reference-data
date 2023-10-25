@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.emcstfereferencedata.fixtures
 
+import uk.gov.hmrc.emcstfereferencedata.models.request.{CnInformationItem, CnInformationRequest}
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, TraderKnownFacts}
 
 trait BaseFixtures {
@@ -23,14 +24,24 @@ trait BaseFixtures {
   val testErn: String = "SomeErn"
   val testCredId: String = "cred1234567891"
   val testInternalId: String = "int1234567891"
-  val testCnCode: String = "24029000"
-  val testProductCode: String = "T400"
-  val testCnCodeList: Seq[String] = Seq(testCnCode)
-  val testProductCodeList: Seq[String] = Seq(testProductCode)
-  val testCnCodeInformation: CnCodeInformation = CnCodeInformation(
+  val testCnCode1: String = "24029000"
+  val testProductCode1: String = "T400"
+  val testCnCodeInformationItem1: CnInformationItem = CnInformationItem(productCode = testProductCode1, cnCode = testCnCode1)
+  val testCnCode2: String = "10000000"
+  val testProductCode2: String = "S500"
+  val testCnCodeInformationItem2: CnInformationItem = CnInformationItem(productCode = testProductCode2, cnCode = testCnCode2)
+  val testCnCodeInformationRequest: CnInformationRequest = CnInformationRequest(items = Seq(testCnCodeInformationItem1, testCnCodeInformationItem2))
+  val testCnCodeInformation1: CnCodeInformation = CnCodeInformation(
     cnCodeDescription = "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+    exciseProductCode = "T400",
     exciseProductCodeDescription = "Fine-cut tobacco for the rolling of cigarettes",
     unitOfMeasureCode = 1
+  )
+  val testCnCodeInformation2: CnCodeInformation = CnCodeInformation(
+    cnCodeDescription = "Other products containing ethyl alcohol",
+    exciseProductCode = "S500",
+    exciseProductCodeDescription = "Other products containing ethyl alcohol",
+    unitOfMeasureCode = 3
   )
   val testPackagingTypes: Seq[String] = Seq(
     "VP",

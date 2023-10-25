@@ -33,15 +33,9 @@ class RetrieveCnCodeInformationController @Inject()(cc: ControllerComponents,
                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
 
-  def show: Action[CnInformationRequest] = authorisedUserPostRequest {
-    json =>
-      for {
-        productCodeList <- (json \ "productCodeList").validate[Seq[String]]
-        cnCodeList <- (json \ "cnCodeList").validate[Seq[String]]
-      } yield CnInformationRequest(productCodeList, cnCodeList)
-  } {
+  def show: Action[CnInformationRequest] = authorisedUserPostRequest(CnInformationRequest.format) {
     implicit request =>
-      service.retrieveCnCodeInformation(request.body.productCodeList, request.body.cnCodeList).map {
+      service.retrieveCnCodeInformation(request.body).map {
         case Right(response) =>
           Ok(Json.toJson(response))
         case Left(error) =>

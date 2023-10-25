@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation
+package uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes
 
 import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
@@ -27,9 +27,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
-                                                       val config: AppConfig
-                                                      ) extends RetrieveCnCodeInformationConnector with BaseConnector {
+class RetrieveProductCodesConnectorStub @Inject()(val http: HttpClient,
+                                                  val config: AppConfig
+                                                 ) extends RetrieveProductCodesConnector with BaseConnector {
 
   type ConnectorOutcome = Map[String, CnCodeInformation]
 
@@ -50,11 +50,11 @@ class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
     }
   }
 
-  def retrieveCnCodeInformation(cnInformationRequest: CnInformationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
+  def retrieveProductCodes(cnInformationRequest: CnInformationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
 
-    logger.info(s"[RetrieveCnCodeInformationConnectorStub][retrieveCnCodeInformation] retrieving CN Code information for items: ${cnInformationRequest.items}")
+    logger.info(s"[RetrieveProductCodesConnectorStub][retrieveProductCodes] retrieving CN Code information for items: ${cnInformationRequest.items}")
 
-    lazy val url: String = s"${config.stubUrl()}/cn-code-information"
+    lazy val url: String = s"${config.stubUrl()}/product-codes"
 
     http.GET(url)(ReferenceDataReads, hc, ec)
       .map {
@@ -66,7 +66,7 @@ class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
       }
       .recover {
         error =>
-          logger.warn(s"[RetrieveCnCodeInformationConnectorStub][retrieveCnCodeInformation] error retrieving reference data from stub: $error")
+          logger.warn(s"[RetrieveProductCodesConnectorStub][retrieveProductCodes] error retrieving reference data from stub: $error")
           Left(UnexpectedDownstreamResponseError)
       }
   }

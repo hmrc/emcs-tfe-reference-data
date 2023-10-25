@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation
+package uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes
 
 
 import cats.instances.either._
 import cats.syntax.traverse._
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation.RetrieveCnCodeInformationConnector._
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes.RetrieveProductCodesConnector._
 import uk.gov.hmrc.emcstfereferencedata.models.request.{CnInformationItem, CnInformationRequest}
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -31,11 +31,11 @@ import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends RetrieveCnCodeInformationConnector with BaseConnector {
-  def retrieveCnCodeInformation(cnInformationRequest: CnInformationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, CnCodeInformation]]] =
+class RetrieveProductCodesConnectorOracle @Inject()(db: Database) extends RetrieveProductCodesConnector with BaseConnector {
+  def retrieveProductCodes(cnInformationRequest: CnInformationRequest)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, CnCodeInformation]]] =
     Future.successful {
 
-      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] retrieving CN Code information for items: ${cnInformationRequest.items}")
+      logger.info(s"[RetrieveProductCodesConnectorOracle][retrieveProductCodes] retrieving CN Code information for items: ${cnInformationRequest.items}")
 
       db.withConnection {
         connection =>
@@ -44,28 +44,24 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
               val storedProcedure = connection.prepareCall(storedProcedureQuery)
 
               storedProcedure.setString(categoryCodeParameterKey, productCode.head.toString)
-              storedProcedure.setString(productCodeParameterKey, productCode)
-              storedProcedure.registerOutParameter(cnCodeParameterKey, Types.REF_CURSOR)
+              storedProcedure.registerOutParameter(productCodeParameterKey, Types.REF_CURSOR)
               storedProcedure.registerOutParameter(productCodeCountParameterKey, Types.NUMERIC)
-              storedProcedure.registerOutParameter(cnCodeCountParameterKey, Types.NUMERIC)
               storedProcedure.execute()
 
-              val resultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
+              val resultSet = storedProcedure.getObject(productCodeParameterKey, classOf[ResultSet])
 
               @tailrec
               def buildResult(map: Map[String, CnCodeInformation] = Map.empty): Map[String, CnCodeInformation] =
                 if (!resultSet.next()) {
                   map
                 } else {
-                  val cnCodeFromOracle = resultSet.getString(cnCodeKey)
-                  if (cnCode == cnCodeFromOracle) {
-                    val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
-                    val cnCodeDescription = resultSet.getString(cnCodeDescriptionKey)
-                    val exciseProductCodeDescription = resultSet.getString(exciseProductCodeDescriptionKey)
-                    buildResult(map + (cnCode -> CnCodeInformation(cnCodeDescription = cnCodeDescription, exciseProductCode = productCode, exciseProductCodeDescription = exciseProductCodeDescription, unitOfMeasureCode = unitOfMeasureCode)))
-                  } else {
-                    buildResult(map)
-                  }
+                  val productCodeFromOracle = resultSet.getString(productCodeKey)
+                  val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
+
+                  // using column index rather than column name as there are two "DESCRIPTION" columns
+                  val description = resultSet.getString(descriptionKeyIndex)
+
+                  buildResult(map + (cnCode -> CnCodeInformation(cnCodeDescription = description, exciseProductCode = productCodeFromOracle, exciseProductCodeDescription = description, unitOfMeasureCode = unitOfMeasureCode)))
                 }
 
               val result = buildResult()
@@ -73,7 +69,7 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
               storedProcedure.close()
 
               if (result.isEmpty) {
-                logger.warn(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found for item: $item")
+                logger.warn(s"[RetrieveProductCodesConnectorOracle][retrieveProductCodes] No ProductCodes found for item: $item")
                 Left(ErrorResponse.NoDataReturnedFromDatabaseError)
               } else {
                 Right(result)
