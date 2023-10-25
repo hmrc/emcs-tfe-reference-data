@@ -50,7 +50,81 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
 
         case Right(_) =>
           "return OK with JSON containing the Unit of Measure and CN Code Description" when {
-            "supplied with a list of CN Codes and a list of Product Codes" in new Test {
+            "searching for S500 with other Product Codes" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
+
+              val testRequestJson: JsObject =
+                Json.obj(
+                  "items" -> Json.arr(
+                    Json.obj(
+                      "productCode" -> testProductCode1,
+                      "cnCode" -> testCnCode1
+                    ),
+                    Json.obj(
+                      "productCode" -> testProductCode2,
+                      "cnCode" -> testCnCode2
+                    )
+                  )
+                )
+
+              val testResponseJson: JsObject =
+                Json.obj(
+                  "24029000" -> Json.obj(
+                    "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+                    "exciseProductCode" -> "T400",
+                    "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
+                    "unitOfMeasureCode" -> 1
+                  ),
+                  "10000000" -> Json.obj(
+                    "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                    "exciseProductCode" -> "S500",
+                    "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                    "unitOfMeasureCode" -> 3
+                  )
+                )
+
+
+              val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+              response.status shouldBe Status.OK
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe testResponseJson
+            }
+            "searching for S500 by itself" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.authorised()
+              }
+
+              val testRequestJson: JsObject =
+                Json.obj(
+                  "items" -> Json.arr(
+                    Json.obj(
+                      "productCode" -> testProductCode2,
+                      "cnCode" -> testCnCode2
+                    )
+                  )
+                )
+
+              val testResponseJson: JsObject =
+                Json.obj(
+                  "10000000" -> Json.obj(
+                    "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                    "exciseProductCode" -> "S500",
+                    "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                    "unitOfMeasureCode" -> 3
+                  )
+                )
+
+
+              val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
+
+              response.status shouldBe Status.OK
+              response.header("Content-Type") shouldBe Some("application/json")
+              response.json shouldBe testResponseJson
+            }
+            "searching for Product Codes which aren't S500" in new Test {
               override def setupStubs(): StubMapping = {
                 AuthStub.authorised()
               }

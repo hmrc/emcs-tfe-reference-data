@@ -76,7 +76,8 @@ class RetrieveProductCodesConnectorOracle @Inject()(db: Database) extends Retrie
               }
           }
       }.sequence.map {
-        _.reduce(_ ++ _)
+        value =>
+          if (value.isEmpty) Map.empty else value.reduce(_ ++ _)
       }
 
     }
