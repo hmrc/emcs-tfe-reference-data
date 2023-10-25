@@ -33,9 +33,18 @@ class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieve
 
   private val fakeRequest = FakeRequest(POST, "/oracle/cn-code-information").withJsonBody(
     Json.obj(
-      "productCodeList" -> Json.arr("T400"),
-      "cnCodeList" -> Json.arr("24029000")
-    ))
+      "items" -> Json.arr(
+        Json.obj(
+          "productCode" -> testProductCode1,
+          "cnCode" -> testCnCode1
+        ),
+        Json.obj(
+          "productCode" -> testProductCode2,
+          "cnCode" -> testCnCode2
+        )
+      )
+    )
+  )
 
 
   object TestController extends RetrieveCnCodeInformationController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
@@ -43,18 +52,21 @@ class RetrieveCnCodeInformationControllerSpec extends UnitSpec with MockRetrieve
   "getOtherDataReferenceList" should {
     s"return ${Status.OK} with the retrieved payment details from the charge details" when {
       "the services returns the other reference data" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Right(Map(testCnCode -> testCnCodeInformation))))
+        MockService.retrieveCnCodeInformation(testCnCodeInformationRequest)(Future.successful(Right(Map(
+          testCnCode1 -> testCnCodeInformation1,
+          testCnCode2 -> testCnCodeInformation2
+        ))))
 
         val result = call(TestController.show, fakeRequest)
 
         status(result) shouldBe OK
-        contentAsJson(result) shouldBe Json.obj(testCnCode -> testCnCodeInformation)
+        contentAsJson(result) shouldBe Json.obj(testCnCode1 -> testCnCodeInformation1, testCnCode2 -> testCnCodeInformation2)
       }
     }
 
     s"return a server error response" when {
       "the services returns a server error" in {
-        MockService.retrieveCnCodeInformation(testProductCodeList, testCnCodeList)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+        MockService.retrieveCnCodeInformation(testCnCodeInformationRequest)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
         val result = call(TestController.show, fakeRequest)
 

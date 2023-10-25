@@ -19,17 +19,18 @@ package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation.RetrieveCnCodeInformationConnector
+import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MockRetrieveCnCodeInformationConnector extends MockFactory {
-  lazy val mockConnector: RetrieveCnCodeInformationConnector = mock[RetrieveCnCodeInformationConnector]
+  lazy val mockCnCodeInformationConnector: RetrieveCnCodeInformationConnector = mock[RetrieveCnCodeInformationConnector]
 
-  object MockConnector {
-    def retrieveCnCodeInformation(productCodes: Seq[String])(response: Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]): CallHandler3[Seq[String], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]] =
-      (mockConnector.retrieveCnCodeInformation(_: Seq[String])(_: HeaderCarrier, _: ExecutionContext)).expects(productCodes, *, *).returns(response)
+  object MockCnCodeInformationConnector {
+    def retrieveCnCodeInformation(cnInformationRequest: CnInformationRequest)(response: Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]): CallHandler3[CnInformationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]] =
+      (mockCnCodeInformationConnector.retrieveCnCodeInformation(_: CnInformationRequest)(_: HeaderCarrier, _: ExecutionContext)).expects(cnInformationRequest, *, *).returns(response)
   }
 
 }

@@ -56,20 +56,56 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
           val testRequestJson: JsObject =
             Json.obj(
-              "productCodeList" -> Json.arr("T400"),
-              "cnCodeList" -> Json.arr("24029000")
+              "items" -> Json.arr(
+                Json.obj(
+                  "productCode" -> testProductCode1,
+                  "cnCode" -> testCnCode1
+                ),
+                Json.obj(
+                  "productCode" -> testProductCode2,
+                  "cnCode" -> testCnCode2
+                )
+              )
+            )
+
+          val testResponseJson1: JsValue =
+            Json.obj(
+              "24029000" -> Json.obj(
+                "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+                "exciseProductCode" -> "T400",
+                "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
+                "unitOfMeasureCode" -> 1
+              )
+            )
+
+          val testResponseJson2: JsValue =
+            Json.obj(
+              "10000000" -> Json.obj(
+                "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                "exciseProductCode" -> "S500",
+                "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                "unitOfMeasureCode" -> 3
+              )
             )
 
           val testResponseJson: JsValue =
             Json.obj(
               "24029000" -> Json.obj(
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
-                "unitOfMeasureCode" -> 1,
-                "exciseProductCodeDescription" -> "Cigars &amp; cigarillos"
+                "exciseProductCode" -> "T400",
+                "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
+                "unitOfMeasureCode" -> 1
+              ),
+              "10000000" -> Json.obj(
+                "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                "exciseProductCode" -> "S500",
+                "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                "unitOfMeasureCode" -> 3
               )
             )
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-code-information", OK, testResponseJson)
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-code-information", OK, testResponseJson1)
+          DownstreamStub.onSuccess(DownstreamStub.GET, "/product-codes", OK, testResponseJson2)
 
           val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
 
@@ -87,8 +123,16 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
           val testRequestJson: JsObject =
             Json.obj(
-              "productCodeList" -> Json.arr("T400"),
-              "cnCodeList" -> Json.arr("24029000")
+              "items" -> Json.arr(
+                Json.obj(
+                  "productCode" -> testProductCode1,
+                  "cnCode" -> testCnCode1
+                ),
+                Json.obj(
+                  "productCode" -> testProductCode2,
+                  "cnCode" -> testCnCode2
+                )
+              )
             )
 
           val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
@@ -103,8 +147,16 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
           val testRequestJson: JsObject =
             Json.obj(
-              "productCodeList" -> Json.arr("T400"),
-              "cnCodeList" -> Json.arr("24029000")
+              "items" -> Json.arr(
+                Json.obj(
+                  "productCode" -> testProductCode1,
+                  "cnCode" -> testCnCode1
+                ),
+                Json.obj(
+                  "productCode" -> testProductCode2,
+                  "cnCode" -> testCnCode2
+                )
+              )
             )
 
           val testResponseJson: JsValue = JsNull
@@ -124,8 +176,16 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
           val testRequestJson: JsObject =
             Json.obj(
-              "productCodeList" -> Json.arr("T400"),
-              "cnCodeList" -> Json.arr("24029000")
+              "items" -> Json.arr(
+                Json.obj(
+                  "productCode" -> testProductCode1,
+                  "cnCode" -> testCnCode1
+                ),
+                Json.obj(
+                  "productCode" -> testProductCode2,
+                  "cnCode" -> testCnCode2
+                )
+              )
             )
 
           val testResponse: Elem = <Message>Success!</Message>
@@ -145,16 +205,31 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
 
           val testRequestJson: JsObject =
             Json.obj(
-              "productCodeList" -> Json.arr("T400"),
-              "cnCodeList" -> Json.arr("24029000")
+              "items" -> Json.arr(
+                Json.obj(
+                  "productCode" -> testProductCode1,
+                  "cnCode" -> testCnCode1
+                ),
+                Json.obj(
+                  "productCode" -> testProductCode2,
+                  "cnCode" -> testCnCode2
+                )
+              )
             )
 
           val testResponseJson: JsValue =
             Json.obj(
               "24029000" -> Json.obj(
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
-                "unitOfMeasureCode" -> 1,
-                "exciseProductCodeDescription" -> "Cigars &amp; cigarillos"
+                "exciseProductCode" -> "T400",
+                "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
+                "unitOfMeasureCode" -> 1
+              ),
+              "10000000" -> Json.obj(
+                "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                "exciseProductCode" -> "S500",
+                "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                "unitOfMeasureCode" -> 3
               )
             )
 

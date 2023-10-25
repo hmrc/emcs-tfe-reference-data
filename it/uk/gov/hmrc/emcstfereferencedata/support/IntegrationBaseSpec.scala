@@ -24,11 +24,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import play.api.{Application, Environment, Mode}
+import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.stubs.DownstreamStub
 import uk.gov.hmrc.emcstfereferencedata.utils.Logging
 
 trait IntegrationBaseSpec extends UnitSpec with WireMockHelper with GuiceOneServerPerSuite
-  with BeforeAndAfterEach with BeforeAndAfterAll with Logging {
+  with BeforeAndAfterEach with BeforeAndAfterAll with Logging with BaseFixtures {
 
   lazy val client: WSClient = app.injector.instanceOf[WSClient]
 

@@ -57,16 +57,31 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
 
               val testRequestJson: JsObject =
                 Json.obj(
-                  "productCodeList" -> Json.arr("T400"),
-                  "cnCodeList" -> Json.arr("24029000")
+                  "items" -> Json.arr(
+                    Json.obj(
+                      "productCode" -> testProductCode1,
+                      "cnCode" -> testCnCode1
+                    ),
+                    Json.obj(
+                      "productCode" -> testProductCode2,
+                      "cnCode" -> testCnCode2
+                    )
+                  )
                 )
 
               val testResponseJson: JsObject =
                 Json.obj(
                   "24029000" -> Json.obj(
                     "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
+                    "exciseProductCode" -> "T400",
                     "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
                     "unitOfMeasureCode" -> 1
+                  ),
+                  "10000000" -> Json.obj(
+                    "cnCodeDescription" -> "Other products containing ethyl alcohol",
+                    "exciseProductCode" -> "S500",
+                    "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
+                    "unitOfMeasureCode" -> 3
                   )
                 )
 
@@ -87,8 +102,16 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
 
               val testRequestJson: JsObject =
                 Json.obj(
-                  "productCodeList" -> Json.arr("T400"),
-                  "cnCodeList" -> Json.arr("24029000")
+                  "items" -> Json.arr(
+                    Json.obj(
+                      "productCode" -> testProductCode1,
+                      "cnCode" -> testCnCode1
+                    ),
+                    Json.obj(
+                      "productCode" -> testProductCode2,
+                      "cnCode" -> testCnCode2
+                    )
+                  )
                 )
 
               val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
@@ -105,8 +128,16 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
 
               val testRequestJson: JsObject =
                 Json.obj(
-                  "productCodeList" -> Json.arr("T4000"),
-                  "cnCodeList" -> Json.arr("24029000")
+                  "items" -> Json.arr(
+                    Json.obj(
+                      "productCode" -> "testProductCode1",
+                      "cnCode" -> "testCnCode1"
+                    ),
+                    Json.obj(
+                      "productCode" -> testProductCode2,
+                      "cnCode" -> testCnCode2
+                    )
+                  )
                 )
 
               val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)

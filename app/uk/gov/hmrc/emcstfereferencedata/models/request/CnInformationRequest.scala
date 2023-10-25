@@ -19,8 +19,14 @@ package uk.gov.hmrc.emcstfereferencedata.models.request
 import play.api.libs.json.{Json, OFormat}
 
 
-case class CnInformationRequest(productCodeList: Seq[String], cnCodeList: Seq[String])
+case class CnInformationRequest(items: Seq[CnInformationItem])
+
+case class CnInformationItem(productCode: String, cnCode: String)
 
 object CnInformationRequest {
   implicit val format: OFormat[CnInformationRequest] = Json.format[CnInformationRequest]
+}
+
+object CnInformationItem {
+  implicit val format: OFormat[CnInformationItem] = Json.format[CnInformationItem]
 }

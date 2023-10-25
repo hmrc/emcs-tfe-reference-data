@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.emcstfereferencedata.mocks.services
+package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 
 import org.scalamock.handlers.CallHandler3
 import org.scalamock.scalatest.MockFactory
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes.RetrieveProductCodesConnector
 import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
-import uk.gov.hmrc.emcstfereferencedata.services.RetrieveCnCodeInformationService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait MockRetrieveCnCodeInformationService extends MockFactory {
-  lazy val mockService: RetrieveCnCodeInformationService = mock[RetrieveCnCodeInformationService]
+trait MockRetrieveProductCodesConnector extends MockFactory {
+  lazy val mockProductCodesConnector: RetrieveProductCodesConnector = mock[RetrieveProductCodesConnector]
 
-  object MockService {
-    def retrieveCnCodeInformation(cnInformationRequest: CnInformationRequest)(response: Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]): CallHandler3[CnInformationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, CnCodeInformation]]]] =
-      (mockService.retrieveCnCodeInformation(_: CnInformationRequest)(_: HeaderCarrier, _: ExecutionContext)).expects(cnInformationRequest, *, *).returns(response)
+  object MockProductCodesConnector {
+    def retrieveProductCodes(cnInformationRequest: CnInformationRequest)(response: Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]): CallHandler3[CnInformationRequest, HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, CnCodeInformation]]]] =
+      (mockProductCodesConnector.retrieveProductCodes(_: CnInformationRequest)(_: HeaderCarrier, _: ExecutionContext)).expects(cnInformationRequest, *, *).returns(response)
   }
 
 }

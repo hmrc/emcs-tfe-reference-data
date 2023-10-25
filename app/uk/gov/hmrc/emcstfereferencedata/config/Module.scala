@@ -22,6 +22,7 @@ import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation._
 import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes._
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveTraderKnownFacts._
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData._
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes._
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionImpl}
 
 @Singleton
@@ -34,11 +35,13 @@ class Module @Inject()(environment: Environment, config: Configuration) extends 
 
     if (config.get[Boolean]("feature-switch.use-oracle")) {
       bind(classOf[RetrieveCnCodeInformationConnector]).to(classOf[RetrieveCnCodeInformationConnectorOracle])
+      bind(classOf[RetrieveProductCodesConnector]).to(classOf[RetrieveProductCodesConnectorOracle])
       bind(classOf[RetrievePackagingTypesConnector]).to(classOf[RetrievePackagingTypesConnectorOracle])
       bind(classOf[RetrieveOtherReferenceDataConnector]).to(classOf[RetrieveOtherReferenceDataConnectorOracle])
       bind(classOf[RetrieveTraderKnownFactsConnector]).to(classOf[RetrieveTraderKnownFactsConnectorOracle])
     } else {
       bind(classOf[RetrieveCnCodeInformationConnector]).to(classOf[RetrieveCnCodeInformationConnectorStub])
+      bind(classOf[RetrieveProductCodesConnector]).to(classOf[RetrieveProductCodesConnectorStub])
       bind(classOf[RetrievePackagingTypesConnector]).to(classOf[RetrievePackagingTypesConnectorStub])
       bind(classOf[RetrieveOtherReferenceDataConnector]).to(classOf[RetrieveOtherReferenceDataConnectorStub])
       bind(classOf[RetrieveTraderKnownFactsConnector]).to(classOf[RetrieveTraderKnownFactsConnectorStub])
