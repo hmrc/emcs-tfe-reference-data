@@ -80,7 +80,8 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
               }
           }
       }.sequence.map {
-        _.reduce(_ ++ _)
+        value =>
+          if(value.isEmpty) Map.empty else value.reduce(_ ++ _)
       }
 
     }
