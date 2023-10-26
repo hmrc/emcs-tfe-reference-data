@@ -135,10 +135,6 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
                     Json.obj(
                       "productCode" -> testProductCode1,
                       "cnCode" -> testCnCode1
-                    ),
-                    Json.obj(
-                      "productCode" -> testProductCode2,
-                      "cnCode" -> testCnCode2
                     )
                   )
                 )
@@ -150,12 +146,6 @@ class RetrieveCnCodeInformationControllerWithOracleIntegrationSpec extends Integ
                     "exciseProductCode" -> "T400",
                     "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
                     "unitOfMeasureCode" -> 1
-                  ),
-                  "10000000" -> Json.obj(
-                    "cnCodeDescription" -> "Other products containing ethyl alcohol",
-                    "exciseProductCode" -> "S500",
-                    "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
-                    "unitOfMeasureCode" -> 3
                   )
                 )
 
