@@ -18,19 +18,20 @@ package uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode
 
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode.RetrieveEPCForCNCodes._
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, CnCodeInformation, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode.RetrieveEPCForCNCodeConnector._
+import uk.gov.hmrc.emcstfereferencedata.models.response.{EPCInformation, ErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.sql.{ResultSet, Types}
 import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveEPCForCNCodeConnectorOracle @Inject()(db: Database) extends RetrieveEPCForCNCodes with BaseConnector {
-  def retrieveEPCForCNCode(cnCode: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Seq[CnCodeInformation]]] =
+class RetrieveEPCForCNCodeConnectorOracle @Inject()(db: Database) extends RetrieveEPCForCNCodeConnector with BaseConnector {
+  def retrieveEPCForCNCode(cnCode: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[EPCInformation]]] =
     Future.successful {
 
-      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] retrieving CN Codes")
+      logger.info(s"[retrieveEPCForCNCode] retrieving EPC Information")
 
       db.withConnection {
         connection =>
@@ -43,11 +44,18 @@ class RetrieveEPCForCNCodeConnectorOracle @Inject()(db: Database) extends Retrie
           val resultSet: ResultSet = storedProcedure.getObject(cnCodesProductParameterKey, classOf[ResultSet])
 
           @tailrec
-          def buildResult(seq: Seq[CnCodeInformation] = Seq.empty): Seq[CnCodeInformation] =
+          def buildResult(seq: Seq[EPCInformation] = Seq.empty): Seq[EPCInformation] =
             if (!resultSet.next()) {
               seq
             } else {
-              buildResult(seq :+ CnCodeInformation(resultSet.getString(cnCodeKey), resultSet.getString(epcCodeKey), resultSet.getString(epcCodeDescriptionKey), 0) )
+              buildResult(seq :+ EPCInformation(
+                resultSet.getString(cnCodeKey),
+                resultSet.getString(cnCodeDescriptionKey),
+                resultSet.getString(epcCodeKey),
+                resultSet.getString(epcCodeDescriptionKey),
+                resultSet.getString(epcCategoryKey),
+                resultSet.getString(epcCategoryDescriptionKey)
+              ) )
             }
 
           val result = buildResult()
@@ -55,7 +63,7 @@ class RetrieveEPCForCNCodeConnectorOracle @Inject()(db: Database) extends Retrie
           storedProcedure.close()
 
           if (result.isEmpty) {
-            logger.warn(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found")
+            logger.warn(s"[retrieveEPCForCNCode] No EPC Code found for: $cnCode")
             Left(ErrorResponse.NoDataReturnedFromDatabaseError)
           } else {
             Right(result)

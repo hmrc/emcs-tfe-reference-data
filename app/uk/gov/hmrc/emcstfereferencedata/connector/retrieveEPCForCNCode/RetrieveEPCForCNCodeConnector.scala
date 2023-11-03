@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode
 
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{EPCInformation, ErrorResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait RetrieveEPCForCNCodes {
-  def retrieveEPCForCNCode(cnCode: String)(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Seq[CnCodeInformation]]]
+trait RetrieveEPCForCNCodeConnector {
+  def retrieveEPCForCNCode(cnCode: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[EPCInformation]]]
 }
 
-object RetrieveEPCForCNCodes {
+object RetrieveEPCForCNCodeConnector {
   private[retrieveEPCForCNCode] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getEPCCodesForCNCode(?, ?)}"
   private[retrieveEPCForCNCode] val cnCodeParameterKey = "pCN_Code"
   private[retrieveEPCForCNCode] val cnCodesProductParameterKey = "pCN_Product_Codes"
@@ -32,4 +33,6 @@ object RetrieveEPCForCNCodes {
   private[retrieveEPCForCNCode] val cnCodeDescriptionKey = "CN_CODE_DESCRIPTION"
   private[retrieveEPCForCNCode] val epcCodeKey = "EPC_PRODUCT_CODE"
   private[retrieveEPCForCNCode] val epcCodeDescriptionKey = "EPC_DESCRIPTION"
+  private[retrieveEPCForCNCode] val epcCategoryKey = "CATEGORY_CODE"
+  private[retrieveEPCForCNCode] val epcCategoryDescriptionKey = "CATEGORY_DESCRIPTION"
 }

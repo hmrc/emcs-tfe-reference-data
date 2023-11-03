@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes
 
-import cats.instances.either._
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.RetrieveAllCNCodes.{cnCodesParameterKey, _}
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, CnCodeInformation, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.RetrieveAllCNCodesConnector._
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.sql.{ResultSet, Types}
@@ -28,11 +27,11 @@ import javax.inject.Inject
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends RetrieveAllCNCodes with BaseConnector {
-  def retrieveAllCnCodes()(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Seq[CNCode]]] =
+class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends RetrieveAllCNCodesConnector with BaseConnector {
+  def retrieveAllCnCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CNCode]]] =
     Future.successful {
 
-      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] retrieving CN Codes")
+      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] retrieving all CN Codes")
 
       db.withConnection {
         connection =>

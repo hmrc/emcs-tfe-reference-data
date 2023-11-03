@@ -18,9 +18,9 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.RetrieveAllCNCodesConnectorOracle
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode.RetrieveEPCForCNCodeConnectorOracle
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode.RetrieveEPCForCNCodeConnector
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionHelper}
+import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class RetrieveEPCForCNCodeController @Inject()(cc: ControllerComponents,
-                                               service: RetrieveEPCForCNCodeConnectorOracle,
+                                               service: RetrieveEPCForCNCodeConnector,
                                                override val auth: AuthAction
                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
@@ -38,8 +38,11 @@ class RetrieveEPCForCNCodeController @Inject()(cc: ControllerComponents,
       service.retrieveEPCForCNCode(cnCode).map {
         case Right(response) =>
           Ok(Json.toJson(response))
+        case Left(error@ErrorResponse.NoDataReturnedFromDatabaseError) =>
+          NotFound(Json.toJson(error))
         case Left(error) =>
           InternalServerError(Json.toJson(error))
+
       }
   }
 

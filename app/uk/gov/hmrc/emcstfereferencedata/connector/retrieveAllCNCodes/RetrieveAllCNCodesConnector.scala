@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes
 
-import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, CnCodeInformation, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait RetrieveAllCNCodes {
-  def retrieveAllCnCodes()(implicit ec: ExecutionContext): Future[Either[ErrorResponse, Seq[CNCode]]]
+trait RetrieveAllCNCodesConnector {
+  def retrieveAllCnCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CNCode]]]
 }
 
-object RetrieveAllCNCodes {
+object RetrieveAllCNCodesConnector {
   private[retrieveAllCNCodes] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getAllCNCodes(?, ?)}"
   private[retrieveAllCNCodes] val cnCodesParameterKey = "pCN_Codes"
   private[retrieveAllCNCodes] val cnCodeCountParameterKey = "pCN_Codes_Count"
