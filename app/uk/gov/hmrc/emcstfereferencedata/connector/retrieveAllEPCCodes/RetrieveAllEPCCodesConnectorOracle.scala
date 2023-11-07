@@ -31,7 +31,7 @@ class RetrieveAllEPCCodesConnectorOracle @Inject()(db: Database) extends Retriev
   def retrieveAllEPCCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[ExciseProductCode]]] =
     Future.successful {
 
-      logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveAllEPCCodes] retrieving all EPC Codes")
+      logger.info(s"[RetrieveAllEPCCodesConnectorOracle][retrieveAllEPCCodes] retrieving all EPC Codes")
 
       db.withConnection {
         connection =>
@@ -62,7 +62,7 @@ class RetrieveAllEPCCodesConnectorOracle @Inject()(db: Database) extends Retriev
           storedProcedure.close()
 
           if (result.isEmpty) {
-            logger.warn(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found")
+            logger.warn(s"[RetrieveAllEPCCodesConnectorOracle][retrieveAllEPCCodes] No EPC Code found")
             Left(ErrorResponse.NoDataReturnedFromDatabaseError)
           } else {
             Right(result)
