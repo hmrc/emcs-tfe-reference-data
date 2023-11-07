@@ -100,7 +100,8 @@ trait BaseFixtures {
     "SI" -> "Slovenia",
     "ES" -> "Spain",
     "SE" -> "Sweden",
-    "GB" -> "United Kingdom"
+    "GB" -> "United Kingdom",
+    "XI" -> "United Kingdom (Northern Ireland)"
   )
 
   val transportUnitsResult: Map[String, String] = Map(
