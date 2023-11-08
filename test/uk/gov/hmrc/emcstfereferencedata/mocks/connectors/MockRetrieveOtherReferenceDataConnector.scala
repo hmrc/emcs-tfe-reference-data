@@ -36,6 +36,9 @@ trait MockRetrieveOtherReferenceDataConnector extends MockFactory {
 
     def retrieveTransportUnits()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
       (mockConnector.retrieveTransportUnits()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
+
+    def retrieveTypesOfDocument()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
+      (mockConnector.retrieveTypesOfDocument()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
   }
 
 }
