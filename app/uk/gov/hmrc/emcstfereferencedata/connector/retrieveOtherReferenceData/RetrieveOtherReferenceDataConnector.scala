@@ -32,6 +32,9 @@ trait RetrieveOtherReferenceDataConnector {
 
   def retrieveTransportUnits()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
     retrieveOtherReferenceData(TransportUnits)
+
+  def retrieveTypesOfDocument()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
+    retrieveOtherReferenceData(TypeOfDocument)
 }
 
 object RetrieveOtherReferenceDataConnector {

@@ -35,3 +35,8 @@ object TransportUnits extends TypeName {
   override val oracleParameter: String = "TransportUnit"
   override val stubUrl: String = "/transport-units"
 }
+
+object TypeOfDocument extends TypeName {
+  override val oracleParameter: String = "TypeOfDocument"
+  override val stubUrl: String = "/type-of-document"
+}
