@@ -39,14 +39,14 @@ class RetrieveTypeOfDocumentControllerWithOracleIntegrationSpec extends Integrat
     }
   }
 
-  "GET /oracle/transport-units (oracle)" when {
+  "GET /oracle/type-of-document (oracle)" when {
     "application.conf points the services to Oracle" should {
       populateCandeDb().toEither match {
         case Left(_) =>
           fail("Could not populate CANDE DB, see above logs for errors")
 
         case Right(_) =>
-          "return OK with JSON containing the transport units" in new Test {
+          "return OK with JSON containing the types of document" in new Test {
 
             val response: WSResponse = Await.result(request().get(), 1.minutes)
 

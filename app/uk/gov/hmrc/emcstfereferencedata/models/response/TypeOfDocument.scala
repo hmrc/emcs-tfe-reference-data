@@ -25,5 +25,5 @@ object TypeOfDocument {
 
   def apply(typesOfDocument: Map[String, String]): Seq[TypeOfDocument] = typesOfDocument.map {
     case (code, description) => TypeOfDocument(code, description)
-  }.toSeq.sortBy(_.description)
+  }.toSeq
 }

@@ -25,5 +25,5 @@ object TransportUnit {
 
   def apply(transportUnits: Map[String, String]): Seq[TransportUnit] = transportUnits.map {
     case (code, description) => TransportUnit(code, description)
-  }.toSeq.sortBy(_.description)
+  }.toSeq
 }

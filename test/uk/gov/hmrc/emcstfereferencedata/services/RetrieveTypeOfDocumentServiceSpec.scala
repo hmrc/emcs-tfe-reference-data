@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.services
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveOtherReferenceDataConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{NoDataReturnedFromDatabaseError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.models.response.TransportUnit
+import uk.gov.hmrc.emcstfereferencedata.models.response.{TransportUnit, TypeOfDocument}
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
@@ -29,10 +29,10 @@ class RetrieveTypeOfDocumentServiceSpec extends UnitSpec with MockRetrieveOtherR
   object TestService extends RetrieveTypeOfDocumentService(mockConnector)
 
   "The RetrieveTypeOfDocumentService" should {
-    "return a successful response containing the transport units" when {
+    "return a successful response containing the types of document" when {
       "retrieveTypeOfDocument method is called" in {
         MockConnector.retrieveTypesOfDocument()(Future.successful(Right(typesOfDocumentResult)))
-        await(TestService.retrieveTypesOfDocument()) shouldBe Right(TransportUnit(typesOfDocumentResult))
+        await(TestService.retrieveTypesOfDocument()) shouldBe Right(TypeOfDocument(typesOfDocumentResult))
       }
     }
 
