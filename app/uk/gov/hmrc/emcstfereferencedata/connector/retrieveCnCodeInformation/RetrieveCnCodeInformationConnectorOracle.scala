@@ -62,7 +62,7 @@ class RetrieveCnCodeInformationConnectorOracle @Inject()(db: Database) extends R
                     val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
                     val cnCodeDescription = resultSet.getString(cnCodeDescriptionKey)
                     val exciseProductCodeDescription = resultSet.getString(exciseProductCodeDescriptionKey)
-                    buildResult(map + (cnCode -> CnCodeInformation(cnCodeDescription = cnCodeDescription, exciseProductCode = productCode, exciseProductCodeDescription = exciseProductCodeDescription, unitOfMeasureCode = unitOfMeasureCode)))
+                    buildResult(map + (cnCode -> CnCodeInformation(cnCode = cnCode, cnCodeDescription = cnCodeDescription, exciseProductCode = productCode, exciseProductCodeDescription = exciseProductCodeDescription, unitOfMeasureCode = unitOfMeasureCode)))
                   } else {
                     buildResult(map)
                   }

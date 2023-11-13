@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.services
 import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
 import uk.gov.hmrc.emcstfereferencedata.mocks.connectors.MockRetrieveOtherReferenceDataConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{NoDataReturnedFromDatabaseError, UnexpectedDownstreamResponseError}
-import uk.gov.hmrc.emcstfereferencedata.models.response.{TransportUnit, TypeOfDocument}
+import uk.gov.hmrc.emcstfereferencedata.models.response.TypeOfDocument
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future

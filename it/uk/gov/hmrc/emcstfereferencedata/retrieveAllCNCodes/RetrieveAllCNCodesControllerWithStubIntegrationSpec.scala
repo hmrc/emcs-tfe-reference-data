@@ -38,9 +38,12 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
 
     private def uri: String = "/oracle/cn-codes"
 
+    def exciseProductCode: String = "TEST_VALUE"
+
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
+        .withQueryStringParameters("exciseProductCode" -> exciseProductCode)
     }
   }
 
@@ -55,45 +58,9 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
           }
 
 
-          val testResponseJson: JsValue =
-            Json.parse(
-              """
-                |[
-                |      {
-                |        "code": "15171090",
-                |        "description": "Margarine, excluding liquid margarine, containing, by weight, no more than 10% of milkfats"
-                |      },
-                |      {
-                |        "code": "22042991",
-                |        "description": "Wine of an alcoholic strength by volume exceeding 15% but not 22% vol. in containers holding more than 2 litres, produced in the Community, without a protected designation of origin (PDO) or a protected geographical indication (PGI)"
-                |      },
-                |      {
-                |        "code": "22030001",
-                |        "description": "Beer made from malt in bottles holding 10 litres or less"
-                |      },
-                |      {
-                |        "code": "22042192",
-                |        "description": "Wine, in containers holding 2 litres or less, produced in the Community, of an actual alcoholic strength by volume exceeding 22% vol."
-                |      },
-                |      {
-                |        "code": "24029000",
-                |        "description": "Cigars, cheroots, cigarillos and cigarettes not containing tobacco"
-                |      },
-                |      {
-                |        "code": "22042180",
-                |        "description": "Wine, other than white, produced in the Community, with a protected geographical indication (PGI) of an actual alcoholic strength by volume not exceeding 15% vol. in containers holding 2 litres or less"
-                |      },
-                |      {
-                |        "code": "22060039",
-                |        "description": "Other sparkling fermented beverages"
-                |      },
-                |      {
-                |        "code": "22060059",
-                |        "description": "Other still fermented beverages in containers holding 2 litres or less"
-                |      }
-                |]""".stripMargin)
+          val testResponseJson: JsValue = Json.toJson(Seq(testCnCodeInformation1, testCnCodeInformation2))
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-codes", OK, testResponseJson)
+          DownstreamStub.onSuccess(DownstreamStub.GET, s"/cn-codes/$exciseProductCode", OK, testResponseJson)
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 
@@ -121,7 +88,7 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
 
           val testResponseJson: JsValue = JsNull
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-codes", OK, testResponseJson)
+          DownstreamStub.onSuccess(DownstreamStub.GET, s"/cn-codes/$exciseProductCode", OK, testResponseJson)
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 
@@ -137,7 +104,7 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
 
           val testResponse: Elem = <Message>Success!</Message>
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-codes", OK, testResponse)
+          DownstreamStub.onSuccess(DownstreamStub.GET, s"/cn-codes/$exciseProductCode", OK, testResponse)
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 
@@ -152,22 +119,9 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
 
 
           val testResponseJson: JsValue =
-            Json.obj(
-              "24029000" -> Json.obj(
-                "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
-                "exciseProductCode" -> "T400",
-                "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
-                "unitOfMeasureCode" -> 1
-              ),
-              "10000000" -> Json.obj(
-                "cnCodeDescription" -> "Other products containing ethyl alcohol",
-                "exciseProductCode" -> "S500",
-                "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
-                "unitOfMeasureCode" -> 3
-              )
-            )
+            Json.obj()
 
-          DownstreamStub.onSuccess(DownstreamStub.GET, "/cn-codes", BAD_REQUEST, testResponseJson)
+          DownstreamStub.onSuccess(DownstreamStub.GET, s"/cn-codes/$exciseProductCode", BAD_REQUEST, testResponseJson)
 
           val response: WSResponse = Await.result(request().get(), 1.minutes)
 

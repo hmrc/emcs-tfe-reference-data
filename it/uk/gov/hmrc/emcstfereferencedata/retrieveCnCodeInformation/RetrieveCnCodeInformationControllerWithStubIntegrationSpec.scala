@@ -71,6 +71,7 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           val testResponseJson1: JsValue =
             Json.obj(
               "24029000" -> Json.obj(
+                "cnCode" -> "24029000",
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
                 "exciseProductCode" -> "T400",
                 "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
@@ -81,6 +82,7 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           val testResponseJson2: JsValue =
             Json.obj(
               "10000000" -> Json.obj(
+                "cnCode" -> "10000000",
                 "cnCodeDescription" -> "Other products containing ethyl alcohol",
                 "exciseProductCode" -> "S500",
                 "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",
@@ -91,12 +93,14 @@ class RetrieveCnCodeInformationControllerWithStubIntegrationSpec extends Integra
           val testResponseJson: JsValue =
             Json.obj(
               "24029000" -> Json.obj(
+                "cnCode" -> "24029000",
                 "cnCodeDescription" -> "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
                 "exciseProductCode" -> "T400",
                 "exciseProductCodeDescription" -> "Fine-cut tobacco for the rolling of cigarettes",
                 "unitOfMeasureCode" -> 1
               ),
               "10000000" -> Json.obj(
+                "cnCode" -> "10000000",
                 "cnCodeDescription" -> "Other products containing ethyl alcohol",
                 "exciseProductCode" -> "S500",
                 "exciseProductCodeDescription" -> "Other products containing ethyl alcohol",

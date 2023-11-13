@@ -28,18 +28,18 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class RetrieveAllCNCodesController @Inject()(cc: ControllerComponents,
-                                             service: RetrieveAllCNCodesConnector,
+                                             connector: RetrieveAllCNCodesConnector,
                                              override val auth: AuthAction
                                                    )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
 
-  def get: Action[AnyContent] = authorisedUserGetRequest {
+  def get(exciseProductCode: String): Action[AnyContent] = authorisedUserGetRequest {
     implicit request =>
-      service.retrieveAllCnCodes().map {
+      connector.retrieveAllCnCodes(exciseProductCode).map {
         case Right(response) =>
           Ok(Json.toJson(response))
-        case Left(error@ErrorResponse.NoDataReturnedFromDatabaseError) =>
-          NotFound(Json.toJson(error))
+        case Left(ErrorResponse.NoDataReturnedFromDatabaseError) =>
+          Ok(Json.arr())
         case Left(error) =>
           InternalServerError(Json.toJson(error))
       }

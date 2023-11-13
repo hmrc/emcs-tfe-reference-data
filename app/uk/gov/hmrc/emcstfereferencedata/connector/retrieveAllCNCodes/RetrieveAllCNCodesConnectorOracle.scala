@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.RetrieveAllCNCodesConnector._
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.sql.{ResultSet, Types}
@@ -28,28 +28,34 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
 class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends RetrieveAllCNCodesConnector with BaseConnector {
-  def retrieveAllCnCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CNCode]]] =
+  def retrieveAllCnCodes(exciseProductCode: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CnCodeInformation]]] =
     Future.successful {
 
       logger.info(s"[RetrieveAllCNCodesConnectorOracle][retrieveAllCnCodes] retrieving all CN Codes")
 
       db.withConnection {
         connection =>
-
           val storedProcedure = connection.prepareCall(storedProcedureQuery)
 
-          storedProcedure.registerOutParameter(cnCodesParameterKey, Types.REF_CURSOR)
+          storedProcedure.setString(categoryCodeParameterKey, exciseProductCode.headOption.getOrElse(' ').toString)
+          storedProcedure.setString(productCodeParameterKey, exciseProductCode)
+          storedProcedure.registerOutParameter(cnCodeParameterKey, Types.REF_CURSOR)
+          storedProcedure.registerOutParameter(productCodeCountParameterKey, Types.NUMERIC)
           storedProcedure.registerOutParameter(cnCodeCountParameterKey, Types.NUMERIC)
           storedProcedure.execute()
 
-          val resultSet: ResultSet = storedProcedure.getObject(cnCodesParameterKey, classOf[ResultSet])
+          val resultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
 
           @tailrec
-          def buildResult(seq: Seq[CNCode] = Seq.empty): Seq[CNCode] =
+          def buildResult(map: Seq[CnCodeInformation] = Seq.empty): Seq[CnCodeInformation] =
             if (!resultSet.next()) {
-              seq
+              map
             } else {
-              buildResult(seq :+ CNCode(resultSet.getString(cnCodeKey), resultSet.getString(cnCodeDescriptionKey)) )
+              val cnCode = resultSet.getString(cnCodeKey)
+              val unitOfMeasureCode = resultSet.getInt(unitOfMeasureCodeKey)
+              val cnCodeDescription = resultSet.getString(cnCodeDescriptionKey)
+              val exciseProductCodeDescription = resultSet.getString(exciseProductCodeDescriptionKey)
+              buildResult(map :+ CnCodeInformation(cnCode = cnCode, cnCodeDescription = cnCodeDescription, exciseProductCode = exciseProductCode, exciseProductCodeDescription = exciseProductCodeDescription, unitOfMeasureCode = unitOfMeasureCode))
             }
 
           val result = buildResult()
@@ -57,13 +63,12 @@ class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends Retrieve
           storedProcedure.close()
 
           if (result.isEmpty) {
-            logger.warn(s"[RetrieveAllCNCodesConnectorOracle][retrieveAllCnCodes] No CN Code found")
+            logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found for EPC: $exciseProductCode")
             Left(ErrorResponse.NoDataReturnedFromDatabaseError)
           } else {
             Right(result)
           }
       }
-
     }
 
 }

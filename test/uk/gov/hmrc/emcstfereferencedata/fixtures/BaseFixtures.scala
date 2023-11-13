@@ -32,12 +32,14 @@ trait BaseFixtures {
   val testCnCodeInformationItem2: CnInformationItem = CnInformationItem(productCode = testProductCode2, cnCode = testCnCode2)
   val testCnCodeInformationRequest: CnInformationRequest = CnInformationRequest(items = Seq(testCnCodeInformationItem1, testCnCodeInformationItem2))
   val testCnCodeInformation1: CnCodeInformation = CnCodeInformation(
+    cnCode = "24029000",
     cnCodeDescription = "Cigars, cheroots, cigarillos and cigarettes not containing tobacco",
     exciseProductCode = "T400",
     exciseProductCodeDescription = "Fine-cut tobacco for the rolling of cigarettes",
     unitOfMeasureCode = 1
   )
   val testCnCodeInformation2: CnCodeInformation = CnCodeInformation(
+    cnCode = "10000000",
     cnCodeDescription = "Other products containing ethyl alcohol",
     exciseProductCode = "S500",
     exciseProductCodeDescription = "Other products containing ethyl alcohol",
