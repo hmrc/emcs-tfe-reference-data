@@ -1,19 +1,19 @@
-POST        /oracle/cn-code-information        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveCnCodeInformationController.show
+POST        /oracle/cn-code-information                uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveCnCodeInformationController.show
 
-POST        /oracle/packaging-types            uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show
+POST        /oracle/packaging-types                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show
 
-POST        /oracle/wine-operations            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show
+POST        /oracle/wine-operations                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show
 
-GET         /oracle/member-states              uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveMemberStatesController.memberStates
+GET         /oracle/member-states                      uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveMemberStatesController.memberStates
 
-GET         /oracle/transport-units            uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTransportUnitsController.show
+GET         /oracle/transport-units                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTransportUnitsController.show
 
-GET         /oracle/type-of-document           uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTypeOfDocumentController.show
+GET         /oracle/type-of-document                   uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTypeOfDocumentController.show
 
-GET         /oracle/trader-known-facts         uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)
+GET         /oracle/trader-known-facts                 uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveTraderKnownFactsController.show(exciseRegistrationId: String)
 
-GET         /oracle/cn-codes                   uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllCNCodesController.get(exciseProductCode: String)
+GET         /oracle/cn-codes/:exciseProductCode        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllCNCodesController.get(exciseProductCode: String)
 
-GET         /oracle/epc-codes                  uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllEPCCodesController.get
+GET         /oracle/epc-codes                          uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllEPCCodesController.get
 
-GET         /oracle/cn-code-epc/:cnCode        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveEPCForCNCodeController.get(cnCode: String)
+GET         /oracle/cn-code-epc/:cnCode                uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveEPCForCNCodeController.get(cnCode: String)

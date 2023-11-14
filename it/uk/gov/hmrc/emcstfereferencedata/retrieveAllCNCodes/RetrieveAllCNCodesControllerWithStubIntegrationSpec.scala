@@ -36,14 +36,13 @@ class RetrieveAllCNCodesControllerWithStubIntegrationSpec extends IntegrationBas
   private trait Test {
     def setupStubs(): StubMapping
 
-    private def uri: String = "/oracle/cn-codes"
-
     def exciseProductCode: String = "TEST_VALUE"
+
+    private def uri: String = s"/oracle/cn-codes/$exciseProductCode"
 
     def request(): WSRequest = {
       setupStubs()
       buildRequest(uri)
-        .withQueryStringParameters("exciseProductCode" -> exciseProductCode)
     }
   }
 
