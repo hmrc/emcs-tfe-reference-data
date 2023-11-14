@@ -18,10 +18,9 @@ package uk.gov.hmrc.emcstfereferencedata.config
 
 import com.google.inject.{AbstractModule, Inject, Singleton}
 import play.api.{Configuration, Environment}
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.{RetrieveAllCNCodesConnector, RetrieveAllCNCodesConnectorOracle, RetrieveAllCNCodesConnectorStub, RetrieveEPCForCNCodeConnectorStub}
+import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes.{RetrieveAllCNCodesConnector, RetrieveAllCNCodesConnectorOracle, RetrieveAllCNCodesConnectorStub}
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllEPCCodes.{RetrieveAllEPCCodesConnector, RetrieveAllEPCCodesConnectorOracle, RetrieveAllEPCCodesConnectorStub}
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveCnCodeInformation._
-import uk.gov.hmrc.emcstfereferencedata.connector.retrieveEPCForCNCode.{RetrieveEPCForCNCodeConnector, RetrieveEPCForCNCodeConnectorOracle}
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveOtherReferenceData._
 import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes._
 import uk.gov.hmrc.emcstfereferencedata.connector.retrieveProductCodes._
@@ -43,7 +42,6 @@ class Module @Inject()(environment: Environment, config: Configuration) extends 
       bind(classOf[RetrieveOtherReferenceDataConnector]).to(classOf[RetrieveOtherReferenceDataConnectorOracle])
       bind(classOf[RetrieveTraderKnownFactsConnector]).to(classOf[RetrieveTraderKnownFactsConnectorOracle])
       bind(classOf[RetrieveAllCNCodesConnector]).to(classOf[RetrieveAllCNCodesConnectorOracle])
-      bind(classOf[RetrieveEPCForCNCodeConnector]).to(classOf[RetrieveEPCForCNCodeConnectorOracle])
       bind(classOf[RetrieveAllEPCCodesConnector]).to(classOf[RetrieveAllEPCCodesConnectorOracle])
     } else {
       bind(classOf[RetrieveCnCodeInformationConnector]).to(classOf[RetrieveCnCodeInformationConnectorStub])
@@ -52,7 +50,6 @@ class Module @Inject()(environment: Environment, config: Configuration) extends 
       bind(classOf[RetrieveOtherReferenceDataConnector]).to(classOf[RetrieveOtherReferenceDataConnectorStub])
       bind(classOf[RetrieveTraderKnownFactsConnector]).to(classOf[RetrieveTraderKnownFactsConnectorStub])
       bind(classOf[RetrieveAllCNCodesConnector]).to(classOf[RetrieveAllCNCodesConnectorStub])
-      bind(classOf[RetrieveEPCForCNCodeConnector]).to(classOf[RetrieveEPCForCNCodeConnectorStub])
       bind(classOf[RetrieveAllEPCCodesConnector]).to(classOf[RetrieveAllEPCCodesConnectorStub])
     }
 

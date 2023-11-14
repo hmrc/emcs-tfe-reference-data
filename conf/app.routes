@@ -15,5 +15,3 @@ GET         /oracle/trader-known-facts                 uk.gov.hmrc.emcstferefere
 GET         /oracle/cn-codes/:exciseProductCode        uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllCNCodesController.get(exciseProductCode: String)
 
 GET         /oracle/epc-codes                          uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveAllEPCCodesController.get
-
-GET         /oracle/cn-code-epc/:cnCode                uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveEPCForCNCodeController.get(cnCode: String)

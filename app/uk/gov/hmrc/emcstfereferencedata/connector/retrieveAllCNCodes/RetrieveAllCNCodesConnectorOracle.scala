@@ -44,7 +44,7 @@ class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends Retrieve
           storedProcedure.registerOutParameter(cnCodeCountParameterKey, Types.NUMERIC)
           storedProcedure.execute()
 
-          val resultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
+          val resultSet: ResultSet = storedProcedure.getObject(cnCodeParameterKey, classOf[ResultSet])
 
           @tailrec
           def buildResult(map: Seq[CnCodeInformation] = Seq.empty): Seq[CnCodeInformation] =
@@ -63,7 +63,7 @@ class RetrieveAllCNCodesConnectorOracle @Inject()(db: Database) extends Retrieve
           storedProcedure.close()
 
           if (result.isEmpty) {
-            logger.info(s"[RetrieveCnCodeInformationConnectorOracle][retrieveCnCodeInformation] No CN Code found for EPC: $exciseProductCode")
+            logger.warn(s"[RetrieveAllCNCodesConnectorOracle][retrieveAllCnCodes] No CN Code found for EPC: $exciseProductCode")
             Left(ErrorResponse.NoDataReturnedFromDatabaseError)
           } else {
             Right(result)
