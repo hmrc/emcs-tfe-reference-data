@@ -61,7 +61,7 @@ class RetrieveProductCodesConnectorOracle @Inject()(db: Database) extends Retrie
                   // using column index rather than column name as there are two "DESCRIPTION" columns
                   val description = resultSet.getString(descriptionKeyIndex)
 
-                  buildResult(map + (cnCode -> CnCodeInformation(cnCodeDescription = description, exciseProductCode = productCodeFromOracle, exciseProductCodeDescription = description, unitOfMeasureCode = unitOfMeasureCode)))
+                  buildResult(map + (cnCode -> CnCodeInformation(cnCode = cnCode, cnCodeDescription = description, exciseProductCode = productCodeFromOracle, exciseProductCodeDescription = description, unitOfMeasureCode = unitOfMeasureCode)))
                 }
 
               val result = buildResult()

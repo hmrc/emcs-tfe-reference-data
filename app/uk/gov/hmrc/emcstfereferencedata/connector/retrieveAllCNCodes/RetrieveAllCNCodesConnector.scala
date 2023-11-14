@@ -16,19 +16,24 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connector.retrieveAllCNCodes
 
-import uk.gov.hmrc.emcstfereferencedata.models.response.{CNCode, ErrorResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RetrieveAllCNCodesConnector {
-  def retrieveAllCnCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CNCode]]]
+  def retrieveAllCnCodes(exciseProductCode: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CnCodeInformation]]]
 }
 
 object RetrieveAllCNCodesConnector {
-  private[retrieveAllCNCodes] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getAllCNCodes(?, ?)}"
-  private[retrieveAllCNCodes] val cnCodesParameterKey = "pCN_Codes"
+  private[retrieveAllCNCodes] val storedProcedureQuery = "{call EMCS_DATA.EMCS_REFERENCE_DATA.getCNCodes(?, ?, ?, ?, ?)}"
+  private[retrieveAllCNCodes] val categoryCodeParameterKey = "pCategory_code"
+  private[retrieveAllCNCodes] val productCodeParameterKey = "pProduct_Code"
+  private[retrieveAllCNCodes] val cnCodeParameterKey = "pCN_Codes"
+  private[retrieveAllCNCodes] val productCodeCountParameterKey = "pProduct_count"
   private[retrieveAllCNCodes] val cnCodeCountParameterKey = "pCN_Codes_Count"
+  private[retrieveAllCNCodes] val unitOfMeasureCodeKey = "UNIT_OF_MEASURE_CODE"
   private[retrieveAllCNCodes] val cnCodeKey = "CN_CODE"
   private[retrieveAllCNCodes] val cnCodeDescriptionKey = "CNCODEDESC"
+  private[retrieveAllCNCodes] val exciseProductCodeDescriptionKey = "PRODDESC"
 }

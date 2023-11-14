@@ -18,7 +18,7 @@ package uk.gov.hmrc.emcstfereferencedata.models.response
 
 import play.api.libs.json._
 
-case class CnCodeInformation(cnCodeDescription: String, exciseProductCode: String, exciseProductCodeDescription: String, unitOfMeasureCode: Int)
+case class CnCodeInformation(cnCode: String, cnCodeDescription: String, exciseProductCode: String, exciseProductCodeDescription: String, unitOfMeasureCode: Int)
 
 object CnCodeInformation {
   implicit val format: OFormat[CnCodeInformation] = Json.format[CnCodeInformation]
