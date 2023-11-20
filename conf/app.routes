@@ -1,5 +1,7 @@
 POST        /oracle/cn-code-information                uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveCnCodeInformationController.show
 
+GET         /oracle/packaging-types                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.showAllPackagingTypes(isCountable: Option[Boolean])
+
 POST        /oracle/packaging-types                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show
 
 POST        /oracle/wine-operations                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show

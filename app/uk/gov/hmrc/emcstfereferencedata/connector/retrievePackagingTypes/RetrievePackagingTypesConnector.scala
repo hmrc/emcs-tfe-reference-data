@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes
 
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RetrievePackagingTypesConnector {
-  def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]]
+  def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, PackagingType]]]
 }
 
 object RetrievePackagingTypesConnector {
@@ -40,4 +40,5 @@ object RetrievePackagingTypesConnector {
   private[retrievePackagingTypes] val descriptionListKey = "pDescription_list"
   private[retrievePackagingTypes] val codeKey = "CODE"
   private[retrievePackagingTypes] val descriptionKey = "DESCRIPTION"
+  private[retrievePackagingTypes] val countableKey = "COUNTABLE"
 }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes
 import play.api.db.Database
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes.RetrievePackagingTypesConnector._
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.sql.{CallableStatement, ResultSet, Types}
@@ -28,7 +28,7 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 
 class RetrievePackagingTypesConnectorOracle @Inject()(db: Database) extends RetrievePackagingTypesConnector with BaseConnector {
-  def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
+  def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, PackagingType]]] =
     Future.successful {
 
       db.withConnection {
@@ -36,7 +36,7 @@ class RetrievePackagingTypesConnectorOracle @Inject()(db: Database) extends Retr
           val storedProcedure: CallableStatement = connection.prepareCall(storedProcedureQuery)
 
           storedProcedure.setString(typeNameParameterKey, typeNameParameterValue)
-          storedProcedure.setInt(sortByParameterKey, 1)
+          storedProcedure.setInt(sortByParameterKey, 4)
           storedProcedure.setString(sortOrderParameterKey, null)
           storedProcedure.setInt(startAtParameterKey, 0)
           storedProcedure.setInt(maxRecordsParameterKey, 1000)
@@ -50,13 +50,14 @@ class RetrievePackagingTypesConnectorOracle @Inject()(db: Database) extends Retr
           val resultSet = storedProcedure.getObject(referenceDataKey, classOf[ResultSet])
 
           @tailrec
-          def buildResult(map: Map[String, String] = Map.empty): Map[String, String] =
+          def buildResult(map: Map[String, PackagingType] = Map.empty): Map[String, PackagingType] =
             if (!resultSet.next()) {
               map
             } else {
               val code = resultSet.getString(codeKey)
               val description = resultSet.getString(descriptionKey)
-              buildResult(map + (code -> description))
+              val isCountable = resultSet.getInt(countableKey) == 1
+              buildResult(map + (code -> PackagingType(code, description, isCountable)))
             }
 
           val result = buildResult()

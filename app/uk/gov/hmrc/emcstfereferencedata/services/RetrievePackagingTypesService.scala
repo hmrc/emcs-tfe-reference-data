@@ -17,13 +17,14 @@
 package uk.gov.hmrc.emcstfereferencedata.services
 
 import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes.RetrievePackagingTypesConnector
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.utils.Logging
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.{Inject, Singleton}
 import scala.collection.Map
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -34,7 +35,7 @@ class RetrievePackagingTypesService @Inject()(connector: RetrievePackagingTypesC
       .map(
         _.map {
           _.collect {
-            case (key, value) if packagingTypesList.contains(key) => key -> value
+            case packagingType if packagingTypesList.contains(packagingType._1) => packagingType._1 -> packagingType._2.description
           }
         } match {
           case Left(value) => Left(value)
@@ -44,6 +45,23 @@ class RetrievePackagingTypesService @Inject()(connector: RetrievePackagingTypesC
             Left(NoDataReturnedFromDatabaseError)
         }
       )
+  }
+
+  def retrievePackagingTypes(isCountable: Option[Boolean])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] = {
+    connector.retrievePackagingTypes()
+      .map {
+        case Left(value) => Left(value)
+        case Right(value) if value.nonEmpty =>
+          Right(returnResult(isCountable)(value))
+        case _ =>
+          logger.warn("No data returned for all packaging types")
+          Left(NoDataReturnedFromDatabaseError)
+      }
+  }
+
+  private def returnResult(isCountable: Option[Boolean])(resultsFromCall: Map[String, PackagingType]): Map[String, String] = {
+    val filteredResults = if(isCountable.isDefined) resultsFromCall.filter(packagingType => packagingType._2.isCountable == isCountable.get) else resultsFromCall
+    ListMap(filteredResults.map(packagingType => packagingType._1 -> packagingType._2.description).toSeq.sortBy(_._2): _*)
   }
 
 }

@@ -19,7 +19,7 @@ package uk.gov.hmrc.emcstfereferencedata.mocks.connectors
 import org.scalamock.handlers.CallHandler2
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes.RetrievePackagingTypesConnector
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,7 +28,7 @@ trait MockRetrievePackagingTypesConnector extends MockFactory {
   lazy val mockConnector: RetrievePackagingTypesConnector = mock[RetrievePackagingTypesConnector]
 
   object MockConnector {
-    def retrievePackagingTypes()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
+    def retrievePackagingTypes()(response: Future[Either[ErrorResponse, Map[String, PackagingType]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, PackagingType]]]] =
       (mockConnector.retrievePackagingTypes()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
   }
 

@@ -30,6 +30,9 @@ trait MockRetrievePackagingTypesService extends MockFactory {
   object MockService {
     def retrievePackagingTypes(packagingTypesList: Seq[String])(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler3[Seq[String], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, String]]]] =
       (mockService.retrievePackagingTypes(_: Seq[String])(_: HeaderCarrier, _: ExecutionContext)).expects(packagingTypesList, *, *).returns(response)
+
+    def retrievePackagingTypes(optIsCountable: Option[Boolean])(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler3[Option[Boolean], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, String]]]] =
+      (mockService.retrievePackagingTypes(_: Option[Boolean])(_: HeaderCarrier, _: ExecutionContext)).expects(optIsCountable, *, *).returns(response)
   }
 
 }

@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
+import uk.gov.hmrc.emcstfereferencedata.fixtures.PackagingTypeFixtures
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.stubs.AuthStub
 import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDatabase}
@@ -28,7 +28,7 @@ import uk.gov.hmrc.emcstfereferencedata.support.{IntegrationBaseSpec, TestDataba
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends IntegrationBaseSpec with BaseFixtures with TestDatabase {
+class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends IntegrationBaseSpec with PackagingTypeFixtures with TestDatabase {
 
   override def servicesConfig: Map[String, _] = super.servicesConfig + ("feature-switch.use-oracle" -> true)
 
@@ -43,7 +43,7 @@ class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends Integrat
     }
   }
 
-  "POST /oracle/cn-code-information (oracle)" when {
+  "POST /oracle/packaging-types (oracle)" when {
     "application.conf points the services to Oracle" should {
       populateCandeDb().toEither match {
         case Left(_) =>
@@ -58,8 +58,7 @@ class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends Integrat
 
               val testRequestJson: JsValue = Json.toJson(testPackagingTypes)
 
-              val testResponseJson: JsObject = Json.toJsObject(testPackagingTypesResult)
-
+              val testResponseJson: JsObject = Json.toJsObject(testPackagingTypesServiceResult)
 
               val response: WSResponse = Await.result(request().post(testRequestJson), 1.minutes)
 
@@ -98,6 +97,41 @@ class RetrievePackagingTypesControllerWithOracleIntegrationSpec extends Integrat
               response.body should include(NoDataReturnedFromDatabaseError.message)
             }
           }
+      }
+    }
+  }
+
+  "GET /oracle/packaging-types (oracle)" when {
+    "application.conf points the services to Oracle" should {
+      populateCandeDb().toEither match {
+        case Left(_) =>
+          fail("Could not populate CANDE DB, see above logs for errors")
+
+        case Right(_) =>
+          "return OK with JSON containing the packaging type descriptions" in new Test {
+            override def setupStubs(): StubMapping = {
+              AuthStub.authorised()
+            }
+
+            val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+            response.status shouldBe Status.OK
+            response.header("Content-Type") shouldBe Some("application/json")
+            Json.parse(response.body) shouldBe allPackagingTypesServiceResultOrderedJson
+          }
+
+          "return Forbidden" when {
+            "user is unauthorised" in new Test {
+              override def setupStubs(): StubMapping = {
+                AuthStub.unauthorised()
+              }
+
+              val response: WSResponse = Await.result(request().get(), 1.minutes)
+
+              response.status shouldBe Status.FORBIDDEN
+            }
+          }
+
       }
     }
   }
