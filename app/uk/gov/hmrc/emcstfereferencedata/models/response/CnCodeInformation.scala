@@ -17,11 +17,20 @@
 package uk.gov.hmrc.emcstfereferencedata.models.response
 
 import play.api.libs.json._
+import uk.gov.hmrc.emcstfereferencedata.utils.StringUtils
 
 case class CnCodeInformation(cnCode: String, cnCodeDescription: String, exciseProductCode: String, exciseProductCodeDescription: String, unitOfMeasureCode: Int)
 
 object CnCodeInformation {
-  implicit val format: OFormat[CnCodeInformation] = Json.format[CnCodeInformation]
+  implicit val reads: Reads[CnCodeInformation] = Json.reads[CnCodeInformation]
+
+  implicit val writes: OWrites[CnCodeInformation] = (o: CnCodeInformation) => Json.obj(
+    "cnCode" -> o.cnCode,
+    "cnCodeDescription" -> StringUtils.removeHtmlEscapedCharactersAndAddSmartQuotes(o.cnCodeDescription),
+    "exciseProductCode" -> o.exciseProductCode,
+    "exciseProductCodeDescription" -> StringUtils.removeHtmlEscapedCharactersAndAddSmartQuotes(o.exciseProductCodeDescription),
+    "unitOfMeasureCode" -> o.unitOfMeasureCode
+  )
 
   implicit val mapReads: Reads[Map[String, CnCodeInformation]] = {
     case JsObject(underlying) => JsSuccess(underlying.map {
