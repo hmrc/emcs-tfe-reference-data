@@ -45,16 +45,6 @@ trait BaseFixtures {
     exciseProductCodeDescription = "Other products containing ethyl alcohol",
     unitOfMeasureCode = 3
   )
-  val testPackagingTypes: Seq[String] = Seq(
-    "VP",
-    "NE",
-    "TO"
-  )
-  val testPackagingTypesResult: Map[String, String] = Map(
-    "NE" -> "Unpacked or unpackaged",
-    "TO" -> "Tun",
-    "VP" -> "Vacuum-packed"
-  )
   val testWineOperations: Seq[String] = Seq(
     "4",
     "11",

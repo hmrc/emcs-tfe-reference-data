@@ -22,28 +22,29 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.FakeAuthAction
-import uk.gov.hmrc.emcstfereferencedata.fixtures.BaseFixtures
+import uk.gov.hmrc.emcstfereferencedata.fixtures.PackagingTypeFixtures
 import uk.gov.hmrc.emcstfereferencedata.mocks.services.MockRetrievePackagingTypesService
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.NoDataReturnedFromDatabaseError
 import uk.gov.hmrc.emcstfereferencedata.support.UnitSpec
 
 import scala.concurrent.Future
 
-class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePackagingTypesService with BaseFixtures with FakeAuthAction {
+class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePackagingTypesService with PackagingTypeFixtures with FakeAuthAction {
 
-  private val fakeRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testPackagingTypes))
+  private val fakePostRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testPackagingTypes))
+  private val fakeGetRequest = FakeRequest(GET, "/oracle/packaging-types")
 
   object TestController extends RetrievePackagingTypesController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
-  "getOtherDataReferenceList" should {
-    s"return ${Status.OK} with the retrieved payment details from the charge details" when {
+  "show" should {
+    s"return ${Status.OK} with the retrieved packaging types" when {
       "the services returns the other reference data" in {
-        MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Right(testPackagingTypesResult)))
+        MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Right(testPackagingTypesServiceResult)))
 
-        val result = call(TestController.show, fakeRequest)
+        val result = call(TestController.show, fakePostRequest)
 
         status(result) shouldBe OK
-        contentAsJson(result) shouldBe Json.toJson(testPackagingTypesResult)
+        contentAsJson(result) shouldBe Json.toJson(testPackagingTypesServiceResult)
       }
     }
 
@@ -51,7 +52,31 @@ class RetrievePackagingTypesControllerSpec extends UnitSpec with MockRetrievePac
       "the services returns a server error" in {
         MockService.retrievePackagingTypes(testPackagingTypes)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
-        val result = call(TestController.show, fakeRequest)
+        val result = call(TestController.show, fakePostRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(NoDataReturnedFromDatabaseError)
+      }
+    }
+  }
+
+  "showAllPackagingTypes" should {
+    s"return ${Status.OK} with all the packaging types" when {
+      "the services returns the other reference data" in {
+        MockService.retrievePackagingTypes(None)(Future.successful(Right(testPackagingTypesServiceResult)))
+
+        val result = call(TestController.showAllPackagingTypes(None), fakeGetRequest)
+
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe Json.toJson(testPackagingTypesServiceResultOrdered)
+      }
+    }
+
+    s"return a server error response" when {
+      "the services returns a server error" in {
+        MockService.retrievePackagingTypes(None)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+
+        val result = call(TestController.showAllPackagingTypes(None), fakeGetRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(NoDataReturnedFromDatabaseError)

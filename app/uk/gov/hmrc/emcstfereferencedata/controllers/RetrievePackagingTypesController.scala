@@ -17,7 +17,7 @@
 package uk.gov.hmrc.emcstfereferencedata.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionHelper}
 import uk.gov.hmrc.emcstfereferencedata.services.RetrievePackagingTypesService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -31,6 +31,15 @@ class RetrievePackagingTypesController @Inject()(cc: ControllerComponents,
                                                  override val auth: AuthAction
                                                 )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
+  def showAllPackagingTypes(optIsCountable: Option[Boolean]): Action[AnyContent] = authorisedUserGetRequest {
+    implicit request =>
+      service.retrievePackagingTypes(optIsCountable).map {
+        case Right(response) =>
+          Ok(Json.toJson(response))
+        case Left(error) =>
+          InternalServerError(Json.toJson(error))
+      }
+  }
 
   def show: Action[Seq[String]] = authorisedUserPostRequest {
     json =>

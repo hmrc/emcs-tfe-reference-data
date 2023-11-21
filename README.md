@@ -61,7 +61,7 @@ Retrieve CN Code information for a given list of Product Codes and CN Codes
 </details>
 
 <details>
-<summary>Retrieve packaging types
+<summary>Retrieve particular packaging types
 
 **`POST`** /oracle/packaging-types</summary>
 
@@ -94,6 +94,41 @@ Retrieve packaging type information for a list of packaging types
   "NE": "Unpacked or unpackaged",
   "TO": "Tun",
   "VP": "Vacuum-packed"
+}
+```
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfereferencedata/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Retrieve all packaging types
+
+**`GET`** /oracle/packaging-types</summary>
+
+Retrieve all packaging type information. An optional `isCountable` boolean query parameter
+can be provided to find `countable` packaging types.
+The response is sorted by the description in ascending (A-Z) order.
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: Key:value pair of String:String
+
+**Example response body**:
+
+```json
+{
+  "CR": "Crate",
+  "FD": "Framed crate",
+  "VA": "Vat"
 }
 ```
 

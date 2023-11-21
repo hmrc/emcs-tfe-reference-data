@@ -17,11 +17,10 @@
 package uk.gov.hmrc.emcstfereferencedata.connector.retrievePackagingTypes
 
 import play.api.http.Status.OK
-import play.api.libs.json.{JsError, JsObject, JsSuccess, Reads}
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
-import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 
 import javax.inject.Inject
@@ -31,20 +30,13 @@ class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClient,
                                                     val config: AppConfig
                                                       ) extends RetrievePackagingTypesConnector with BaseConnector {
 
-  type ConnectorOutcome = Map[String, String]
-
-  private val mapReads: Reads[Map[String, String]] = {
-    case JsObject(underlying) => JsSuccess(underlying.map {
-      case (k, v) => k -> v.as[String]
-    }.toMap)
-    case other => JsError(s"Cannot parse JSON as Map[String, String]: $other")
-  }
+  type ConnectorOutcome = Map[String, PackagingType]
 
   implicit object ReferenceDataReads extends HttpReads[Either[ErrorResponse, ConnectorOutcome]] {
     override def read(method: String, url: String, response: HttpResponse): Either[ErrorResponse, ConnectorOutcome] = {
       response.status match {
         case OK =>
-          response.validateJson(mapReads) match {
+          response.validateJson(PackagingType.mapReads) match {
             case Some(valid) => Right(valid)
             case None =>
               logger.warn(s"[read] Bad JSON response from emcs-tfe-reference-data-stub")
@@ -56,6 +48,7 @@ class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClient,
       }
     }
   }
+
   def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
     lazy val url: String = s"${config.stubUrl()}/packaging-types"
 
