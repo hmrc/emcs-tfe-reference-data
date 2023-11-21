@@ -163,7 +163,7 @@ class RetrieveAllEPCCodesControllerWithStubIntegrationSpec extends IntegrationBa
                 |  },
                 |  {
                 |    "code": "E920",
-                |    "description": "Products falling within CN code 3824 90 99, if these are intended for use as heating fuel or motor fuel &ndash; others than Fatty-acid mono-alkyl esters, containing by volume 96,5 % or more of esters (FAMAE)",
+                |    "description": "Products falling within CN code 3824 90 99, if these are intended for use as heating fuel or motor fuel – others than Fatty-acid mono-alkyl esters, containing by volume 96,5 % or more of esters (FAMAE)",
                 |    "category": "E",
                 |    "categoryDescription": "Energy Products"
                 |  },
@@ -211,7 +211,7 @@ class RetrieveAllEPCCodesControllerWithStubIntegrationSpec extends IntegrationBa
                 |  },
                 |  {
                 |    "code": "T300",
-                |    "description": "Cigars &amp; cigarillos",
+                |    "description": "Cigars & cigarillos",
                 |    "category": "T",
                 |    "categoryDescription": "Manufactured tobacco products"
                 |  },
