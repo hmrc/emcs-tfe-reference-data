@@ -14,6 +14,7 @@ object AppDependencies {
     "com.oracle.jdbc" % "ojdbc8"                         % "19.3.0.0",
     "com.oracle.jdbc" % "orai18n"                        % "19.3.0.0",
     "org.typelevel"   %% "cats-core"                     % catsCoreVersion,
+    "org.jsoup"       % "jsoup"                          % "1.15.4",
     jdbc
 
   )

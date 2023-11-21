@@ -16,11 +16,19 @@
 
 package uk.gov.hmrc.emcstfereferencedata.models.response
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json._
+import uk.gov.hmrc.emcstfereferencedata.utils.StringUtils
 
 case class ExciseProductCode(code: String, description: String, category: String, categoryDescription: String)
 
 
 object ExciseProductCode {
-  implicit val format: Format[ExciseProductCode] = Json.format[ExciseProductCode]
+  implicit val reads: Reads[ExciseProductCode] = Json.reads[ExciseProductCode]
+
+  implicit val writes: OWrites[ExciseProductCode] = (o: ExciseProductCode) => Json.obj(
+    "code" -> o.code,
+    "description" -> StringUtils.removeHtmlEscapedCharactersAndAddSmartQuotes(o.description),
+    "category" -> o.category,
+    "categoryDescription" -> StringUtils.removeHtmlEscapedCharactersAndAddSmartQuotes(o.categoryDescription)
+  )
 }
