@@ -31,7 +31,8 @@ import scala.concurrent.Future
 
 class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWineOperationsService with BaseFixtures with FakeAuthAction {
 
-  private val fakeRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testWineOperations))
+  private val fakePostRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testWineOperations))
+  private val fakeGetRequest = FakeRequest(GET, "/oracle/packaging-types")
 
   object TestController extends RetrieveWineOperationsController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
@@ -40,7 +41,7 @@ class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWin
       "the services returns the other reference data" in {
         MockService.retrieveWineOperations(testWineOperations)(Future.successful(Right(testWineOperationsResult)))
 
-        val result = call(TestController.show, fakeRequest)
+        val result = call(TestController.show, fakePostRequest)
 
         status(result) shouldBe OK
         contentAsJson(result) shouldBe Json.toJson(testWineOperationsResult)
@@ -51,7 +52,30 @@ class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWin
       "the services returns a server error" in {
         MockService.retrieveWineOperations(testWineOperations)(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
-        val result = call(TestController.show, fakeRequest)
+        val result = call(TestController.show, fakePostRequest)
+
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) shouldBe Json.toJson(NoDataReturnedFromDatabaseError)
+      }
+    }
+  }
+
+  "showAllWineOperations" should {
+    s"return ${Status.OK} with all the wine operations" when {
+      "the services returns the other reference data" in {
+        MockService.retrieveWineOperations()(Future.successful(Right(testWineOperationsResult)))
+
+        val result = call(TestController.showAllWineOperations(), fakeGetRequest)
+
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe Json.toJson(testWineOperationsResult)
+      }
+    }
+    s"return a server error response" when {
+      "the services returns a server error" in {
+        MockService.retrieveWineOperations()(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+
+        val result = call(TestController.showAllWineOperations(), fakeGetRequest)
 
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
         contentAsJson(result) shouldBe Json.toJson(NoDataReturnedFromDatabaseError)

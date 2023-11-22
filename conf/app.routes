@@ -4,6 +4,8 @@ GET         /oracle/packaging-types                    uk.gov.hmrc.emcstferefere
 
 POST        /oracle/packaging-types                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrievePackagingTypesController.show
 
+GET         /oracle/wine-operations                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.showAllWineOperations
+
 POST        /oracle/wine-operations                    uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveWineOperationsController.show
 
 GET         /oracle/member-states                      uk.gov.hmrc.emcstfereferencedata.controllers.RetrieveMemberStatesController.memberStates
