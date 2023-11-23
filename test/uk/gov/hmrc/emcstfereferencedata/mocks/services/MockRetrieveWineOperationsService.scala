@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.emcstfereferencedata.mocks.services
 
-import org.scalamock.handlers.CallHandler3
+import org.scalamock.handlers.{CallHandler2, CallHandler3}
 import org.scalamock.scalatest.MockFactory
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfereferencedata.services.RetrieveWineOperationsService
@@ -30,6 +30,9 @@ trait MockRetrieveWineOperationsService extends MockFactory {
   object MockService {
     def retrieveWineOperations(wineOperationsList: Seq[String])(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler3[Seq[String], HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, String]]]] =
       (mockService.retrieveWineOperations(_: Seq[String])(_: HeaderCarrier, _: ExecutionContext)).expects(wineOperationsList, *, *).returns(response)
-  }
 
+    def retrieveWineOperations()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, collection.Map[String, String]]]] =
+      (mockService.retrieveWineOperations()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
+
+  }
 }

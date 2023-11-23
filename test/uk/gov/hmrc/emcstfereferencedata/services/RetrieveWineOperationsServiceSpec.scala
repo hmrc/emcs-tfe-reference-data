@@ -29,19 +29,30 @@ class RetrieveWineOperationsServiceSpec extends UnitSpec with MockRetrieveOtherR
 
   "The RetrieveWineOperationsService" should {
     "return a successful response containing the WineOperations" when {
-      "retrieveWineOperations method is called" in {
+      "retrieveWineOperations(Seq[String]) method is called" in {
         val testResponse = Right(testWineOperationsResult)
         MockConnector.retrieveWineOperations()(Future.successful(testResponse))
 
         await(TestService.retrieveWineOperations(testWineOperations)) shouldBe testResponse
       }
+      "retrieveWineOperations() method is called" in {
+        val testResponse = Right(testWineOperationsResult)
+        MockConnector.retrieveWineOperations()(Future.successful(testResponse))
+
+        await(TestService.retrieveWineOperations()) shouldBe testResponse
+      }
     }
 
     "return an Error Response" when {
-      "there is no data available" in {
+      "there is no data available for retrieveWineOperations(Seq[String]) method call" in {
         MockConnector.retrieveWineOperations()(Future.successful(Left(NoDataReturnedFromDatabaseError)))
 
         await(TestService.retrieveWineOperations(testWineOperations)) shouldBe Left(NoDataReturnedFromDatabaseError)
+      }
+      "there is no data available for retrieveWineOperations() method call" in {
+        MockConnector.retrieveWineOperations()(Future.successful(Left(NoDataReturnedFromDatabaseError)))
+
+        await(TestService.retrieveWineOperations()) shouldBe Left(NoDataReturnedFromDatabaseError)
       }
     }
   }

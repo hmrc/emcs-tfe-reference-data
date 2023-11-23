@@ -141,7 +141,41 @@ The response is sorted by the description in ascending (A-Z) order.
 </details>
 
 <details>
-<summary>Retrieve wine operations
+<summary>Retrieve all wine operations
+
+**`GET`** /oracle/wine-operations</summary>
+
+Retrieve all wine operations.
+
+### Responses
+
+#### Success Response(s)
+
+**Status**: 200 (OK)
+
+**Body**: Key:value pair of String:String
+
+**Example response body**:
+
+```json
+{
+  "0": "The product has undergone none of the following operations",
+  "1": "The product has been enriched",
+  "2": "The product has been acidified",
+  "3": "The product has been de-acidified"
+}
+```
+
+#### Error Response(s)
+
+**Status**: 500 (ISE)
+
+**Body**: [ErrorResponse Model](app/uk/gov/hmrc/emcstfereferencedata/models/response/ErrorResponse.scala)
+
+</details>
+
+<details>
+<summary>Retrieve particular wine operations
 
 **`POST`** /oracle/wine-operations</summary>
 
