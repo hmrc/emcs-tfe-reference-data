@@ -31,8 +31,8 @@ import scala.concurrent.Future
 
 class RetrieveWineOperationsControllerSpec extends UnitSpec with MockRetrieveWineOperationsService with BaseFixtures with FakeAuthAction {
 
-  private val fakePostRequest = FakeRequest(POST, "/oracle/packaging-types").withJsonBody(Json.toJson(testWineOperations))
-  private val fakeGetRequest = FakeRequest(GET, "/oracle/packaging-types")
+  private val fakePostRequest = FakeRequest(POST, "/oracle/wine-operations").withJsonBody(Json.toJson(testWineOperations))
+  private val fakeGetRequest = FakeRequest(GET, "/oracle/wine-operations")
 
   object TestController extends RetrieveWineOperationsController(stubControllerComponents(), mockService, FakeSuccessAuthAction)
 
