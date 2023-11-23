@@ -34,6 +34,9 @@ trait MockRetrieveOtherReferenceDataConnector extends MockFactory {
     def retrieveMemberStates()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
       (mockConnector.retrieveMemberStates()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
 
+    def retrieveCountries()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
+      (mockConnector.retrieveCountries()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
+
     def retrieveTransportUnits()(response: Future[Either[ErrorResponse, Map[String, String]]]): CallHandler2[HeaderCarrier, ExecutionContext, Future[Either[ErrorResponse, Map[String, String]]]] =
       (mockConnector.retrieveTransportUnits()(_: HeaderCarrier, _: ExecutionContext)).expects(*, *).returns(response)
 

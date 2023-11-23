@@ -19,21 +19,21 @@ package uk.gov.hmrc.emcstfereferencedata.controllers
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.emcstfereferencedata.controllers.predicates.{AuthAction, AuthActionHelper}
-import uk.gov.hmrc.emcstfereferencedata.services.RetrieveMemberStatesService
+import uk.gov.hmrc.emcstfereferencedata.services.RetrieveMemberStatesAndCountriesService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RetrieveMemberStatesController @Inject()(cc: ControllerComponents,
-                                               service: RetrieveMemberStatesService,
-                                               override val auth: AuthAction
+class RetrieveMemberStatesAndCountriesController @Inject()(cc: ControllerComponents,
+                                                           service: RetrieveMemberStatesAndCountriesService,
+                                                           override val auth: AuthAction
                                               )(implicit ec: ExecutionContext) extends BackendController(cc) with AuthActionHelper {
 
 
   def show: Action[AnyContent] = authorisedUserGetRequest { implicit request =>
-    service.retrieveMemberStates().map {
+    service.get().map {
       case Right(response) =>
         Ok(Json.toJson(response))
       case Left(error) =>
