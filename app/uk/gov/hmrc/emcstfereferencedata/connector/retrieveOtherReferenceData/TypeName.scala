@@ -31,6 +31,11 @@ object MemberStates extends TypeName {
   override val stubUrl: String = "/member-states"
 }
 
+object Countries extends TypeName {
+  override val oracleParameter: String = "Country"
+  override val stubUrl: String = "/countries"
+}
+
 object TransportUnits extends TypeName {
   override val oracleParameter: String = "TransportUnit"
   override val stubUrl: String = "/transport-units"

@@ -30,6 +30,9 @@ trait RetrieveOtherReferenceDataConnector {
   def retrieveMemberStates()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
     retrieveOtherReferenceData(MemberStates)
 
+  def retrieveCountries()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
+    retrieveOtherReferenceData(Countries)
+
   def retrieveTransportUnits()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, Map[String, String]]] =
     retrieveOtherReferenceData(TransportUnits)
 
