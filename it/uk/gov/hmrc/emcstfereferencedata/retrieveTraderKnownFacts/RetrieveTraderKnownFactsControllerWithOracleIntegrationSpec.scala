@@ -51,7 +51,9 @@ class RetrieveTraderKnownFactsControllerWithOracleIntegrationSpec extends Integr
     "application.conf points the services to Oracle" should {
       populateCandeDb().toEither match {
         case Left(_) =>
-          fail("Could not populate CANDE DB, see above logs for errors")
+          "error populating db" in {
+            fail("Could not populate CANDE DB, see above logs for errors")
+          }
 
         case Right(_) =>
           "return OK with JSON containing the trader known facts" when {
