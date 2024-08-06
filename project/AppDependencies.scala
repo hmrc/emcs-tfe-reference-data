@@ -7,9 +7,9 @@ object AppDependencies {
 
   val boostrapVersion   = "8.4.0"
   val scalamockVersion  = "5.2.0"
-  val catsCoreVersion   = "2.10.0"
+  val catsCoreVersion   = "2.12.0"
   val oraVersion        = "19.3.0.0"
-  val jsoupVersion      = "1.17.2"
+  val jsoupVersion      = "1.18.1"
 
   val compile = Seq(
     "uk.gov.hmrc"               %% s"bootstrap-backend$playSuffix"    % boostrapVersion,
