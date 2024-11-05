@@ -5,7 +5,7 @@ object AppDependencies {
 
   val playSuffix        = s"-play-30"
 
-  val boostrapVersion   = "8.4.0"
+  val boostrapVersion   = "9.5.0"
   val scalamockVersion  = "5.2.0"
   val catsCoreVersion   = "2.12.0"
   val oraVersion        = "19.3.0.0"
