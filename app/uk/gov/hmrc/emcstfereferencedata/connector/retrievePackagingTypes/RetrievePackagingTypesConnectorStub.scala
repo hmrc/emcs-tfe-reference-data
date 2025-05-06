@@ -21,12 +21,13 @@ import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, PackagingType}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClient,
+class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClientV2,
                                                     val config: AppConfig
                                                       ) extends RetrievePackagingTypesConnector with BaseConnector {
 
@@ -52,7 +53,9 @@ class RetrievePackagingTypesConnectorStub @Inject()(val http: HttpClient,
   def retrievePackagingTypes()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
     lazy val url: String = s"${config.stubUrl()}/packaging-types"
 
-    http.GET(url)(ReferenceDataReads, hc, ec)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, ConnectorOutcome]](ReferenceDataReads, ec)
       .recover {
         error =>
           logger.warn(s"[retrievePackagingTypes] error retrieving packaging types from stub: $error")

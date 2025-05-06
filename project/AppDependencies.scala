@@ -3,16 +3,16 @@ import sbt._
 
 object AppDependencies {
 
-  val playSuffix        = s"-play-30"
+  val playSuffix        = "-play-30"
 
-  val boostrapVersion   = "9.5.0"
+  val hmrcBootstrapVersion   = "9.11.0"
   val scalamockVersion  = "5.2.0"
-  val catsCoreVersion   = "2.12.0"
+  val catsCoreVersion   = "2.13.0"
   val oraVersion        = "19.3.0.0"
   val jsoupVersion      = "1.18.1"
 
-  val compile = Seq(
-    "uk.gov.hmrc"               %% s"bootstrap-backend$playSuffix"    % boostrapVersion,
+  private val compile = Seq(
+    "uk.gov.hmrc"               %% s"bootstrap-backend$playSuffix"    % hmrcBootstrapVersion,
     "com.oracle.jdbc"           %   "ojdbc8"                          % oraVersion,
     "com.oracle.jdbc"           %   "orai18n"                         % oraVersion,
     "org.typelevel"             %%  "cats-core"                       % catsCoreVersion,
@@ -20,10 +20,16 @@ object AppDependencies {
     jdbc
   )
 
-  val test = Seq(
-    "uk.gov.hmrc"               %% s"bootstrap-test$playSuffix"       % boostrapVersion     % "test, it",
-    "org.scalamock"             %% "scalamock"                        % "5.2.0"             % "test, it",
-    "org.wiremock"              %  "wiremock"                         % "3.3.1"             % "it",
-    "org.jsoup"                 % "jsoup"                             % jsoupVersion        % Test
+  private val test = Seq(
+    "uk.gov.hmrc"               %% s"bootstrap-test$playSuffix"       % hmrcBootstrapVersion,
+    "org.scalamock"             %% "scalamock"                        % "5.2.0",
+    "org.jsoup"                 % "jsoup"                             % jsoupVersion,
+  ).map(_ % Test)
+
+  val it: Seq[ModuleID] = Seq(
+    "uk.gov.hmrc" %% s"bootstrap-test$playSuffix" % hmrcBootstrapVersion % Test
   )
+
+  def apply(): Seq[ModuleID] = compile ++ test
+
 }

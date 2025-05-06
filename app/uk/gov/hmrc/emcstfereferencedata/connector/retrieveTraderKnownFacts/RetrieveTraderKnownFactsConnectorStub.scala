@@ -20,13 +20,14 @@ import play.api.http.Status.OK
 import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
-import uk.gov.hmrc.emcstfereferencedata.models.response.{TraderKnownFacts, ErrorResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, TraderKnownFacts}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveTraderKnownFactsConnectorStub @Inject()(val http: HttpClient,
+class RetrieveTraderKnownFactsConnectorStub @Inject()(val http: HttpClientV2,
                                                        val config: AppConfig
                                                       ) extends RetrieveTraderKnownFactsConnector with BaseConnector {
 
@@ -54,7 +55,9 @@ class RetrieveTraderKnownFactsConnectorStub @Inject()(val http: HttpClient,
 
     lazy val url: String = s"${config.stubUrl()}/trader-known-facts?exciseRegistrationId=$exciseRegistrationId"
 
-    http.GET(url)(ReferenceDataReads, hc, ec)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, ConnectorOutcome]](ReferenceDataReads, ec)
       .recover {
         error =>
           logger.warn(s"[RetrieveTraderKnownFactsConnectorStub][retrieveTraderKnownFacts] error retrieving reference data from stub: $error")
