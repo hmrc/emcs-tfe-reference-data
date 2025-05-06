@@ -22,12 +22,13 @@ import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.request.CnInformationRequest
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
+class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClientV2,
                                                        val config: AppConfig
                                                       ) extends RetrieveCnCodeInformationConnector with BaseConnector {
 
@@ -56,7 +57,9 @@ class RetrieveCnCodeInformationConnectorStub @Inject()(val http: HttpClient,
 
     lazy val url: String = s"${config.stubUrl()}/cn-code-information"
 
-    http.GET(url)(ReferenceDataReads, hc, ec)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, ConnectorOutcome]](ReferenceDataReads, ec)
       .map {
         _.map {
           _.filter {

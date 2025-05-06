@@ -21,13 +21,14 @@ import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfereferencedata.models.response.{ErrorResponse, ExciseProductCode}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RetrieveAllEPCCodesConnectorStub @Inject()(
-                                                 http: HttpClient,
+                                                 http: HttpClientV2,
                                                 val config: AppConfig) extends RetrieveAllEPCCodesConnector with BaseConnector {
 
   private val responseHttpReads: HttpReads[Either[ErrorResponse, Seq[ExciseProductCode]]] = (_: String, _: String, response: HttpResponse) => {
@@ -47,7 +48,9 @@ class RetrieveAllEPCCodesConnectorStub @Inject()(
 
   def retrieveAllEPCCodes()(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[ExciseProductCode]]] = {
     val url: String = s"${config.stubUrl()}/epc-codes"
-    http.GET(url)(responseHttpReads, implicitly, implicitly)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, Seq[ExciseProductCode]]](responseHttpReads, implicitly)
   }
 
 

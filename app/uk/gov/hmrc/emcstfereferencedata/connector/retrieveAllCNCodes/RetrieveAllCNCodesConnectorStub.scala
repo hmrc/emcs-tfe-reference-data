@@ -21,13 +21,14 @@ import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse.{JsonValidationError, UnexpectedDownstreamResponseError}
 import uk.gov.hmrc.emcstfereferencedata.models.response.{CnCodeInformation, ErrorResponse}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class RetrieveAllCNCodesConnectorStub @Inject()(
-                                                 http: HttpClient,
+                                                 http: HttpClientV2,
                                                  val config: AppConfig) extends RetrieveAllCNCodesConnector with BaseConnector {
 
   private val responseHttpReads: HttpReads[Either[ErrorResponse, Seq[CnCodeInformation]]] = (method: String, url: String, response: HttpResponse) => {
@@ -47,7 +48,9 @@ class RetrieveAllCNCodesConnectorStub @Inject()(
 
   def retrieveAllCnCodes(exciseProductCode: String)(implicit ec: ExecutionContext, hc: HeaderCarrier): Future[Either[ErrorResponse, Seq[CnCodeInformation]]] = {
     val url: String = s"${config.stubUrl()}/cn-codes/$exciseProductCode"
-    http.GET(url)(responseHttpReads, implicitly, implicitly)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, Seq[CnCodeInformation]]](responseHttpReads, implicitly)
   }
 
 

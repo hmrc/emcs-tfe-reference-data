@@ -22,12 +22,13 @@ import uk.gov.hmrc.emcstfereferencedata.config.AppConfig
 import uk.gov.hmrc.emcstfereferencedata.connector.BaseConnector
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse
 import uk.gov.hmrc.emcstfereferencedata.models.response.ErrorResponse._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class RetrieveOtherReferenceDataConnectorStub @Inject()(val http: HttpClient,
+class RetrieveOtherReferenceDataConnectorStub @Inject()(val http: HttpClientV2,
                                                         val config: AppConfig
                                                       ) extends RetrieveOtherReferenceDataConnector with BaseConnector {
 
@@ -59,7 +60,9 @@ class RetrieveOtherReferenceDataConnectorStub @Inject()(val http: HttpClient,
   override def retrieveOtherReferenceData(typeName: TypeName)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[ErrorResponse, ConnectorOutcome]] = {
     lazy val url: String = s"${config.stubUrl()}" + typeName.stubUrl
 
-    http.GET(url)(ReferenceDataReads, hc, ec)
+    http
+      .get(url"$url")
+      .execute[Either[ErrorResponse, ConnectorOutcome]](ReferenceDataReads, ec)
       .recover {
         error =>
           logger.warn(s"[retrieveWineOperations] error retrieving $typeName from stub: $error")
