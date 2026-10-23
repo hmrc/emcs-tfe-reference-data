@@ -4,3 +4,4 @@ type: service
 service-type: backend
 test-repositories:
   - emcs-tfe-journey-tests
+serviceNowMapping: SNSVC0021014
